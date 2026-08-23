@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webstore // Grand Billionaire City Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .store-hero {
+            padding: 10rem 2rem 3rem;
+            text-align: center;
+        }
+        .store-hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+        .store-hero p {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .store-page-scope {
+            --store-bg: transparent;
+            --store-card-bg: rgba(12, 5, 5, 0.75);
+            --store-accent: #34d399;
+            --store-gold: #ffb703;
+            --store-flash: #ef4444;
+            --store-text: #ffffff;
+            --store-text-sub: #94a3b8;
+            --store-border: rgba(255, 255, 255, 0.08);
+            
+            width: 100%;
+            padding: 1rem 0 6rem;
+        }
+
+        .store-page-scope .slider-wrapper {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .store-page-scope .slider-track {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding: 1.5rem 2rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        .store-page-scope .slider-track::-webkit-scrollbar { display: none; }
+
+        .store-page-scope .card {
+            flex: 0 0 290px;
+            scroll-snap-align: center;
+            background: var(--store-card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--store-border);
+            border-radius: 20px;
+            padding: 2rem 1.2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .store-page-scope .card.golden {
+            border: 2px solid var(--store-gold);
+            background: linear-gradient(180deg, rgba(255, 183, 3, 0.08) 0%, var(--store-card-bg) 100%);
+            box-shadow: 0 0 30px rgba(255, 183, 3, 0.15);
+            transform: scale(1.02);
+        }
+
+        .store-page-scope .card.event-flash {
+            border: 2px solid var(--store-flash);
+            background: linear-gradient(180deg, rgba(239, 68, 68, 0.15) 0%, var(--store-card-bg) 100%);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
+            transform: scale(1.04);
+        }
+
+        .store-page-scope .badge-label {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.8rem;
+            border-radius: 99px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .store-page-scope .card.golden .badge-label { background: var(--store-gold); color: #000; }
+        .store-page-scope .card.event-flash .badge-label { background: var(--store-flash); color: #fff; animation: pulseDot 2s infinite ease-in-out; }
+
+        .store-page-scope .event-timer-mini {
+            font-size: 0.75rem;
+            color: var(--store-gold);
+            font-weight: 700;
+            margin-top: 0.3rem;
+        }
+
+        .store-page-scope .card h3 { font-family: 'Cinzel', serif; font-size: 1.3rem; margin-bottom: 0.3rem; color: #fff; }
+        .store-page-scope .price-box { margin: 0.8rem 0; }
+        .store-page-scope .old-price { text-decoration: line-through; color: var(--store-text-sub); font-size: 0.9rem; margin-right: 0.3rem; }
+        .store-page-scope .price-amount { font-size: 2.2rem; font-weight: 800; color: #fff; }
+        .store-page-scope .card.golden .price-amount { color: var(--store-gold); }
+        .store-page-scope .card.event-flash .price-amount { color: var(--store-flash); }
+        .store-page-scope .price-usd { font-size: 0.8rem; color: var(--store-text-sub); }
+
+        .store-page-scope .features { list-style: none; text-align: left; margin: 1.2rem 0; font-size: 0.88rem; color: #cbd5e1; }
+        .store-page-scope .features li { margin-bottom: 0.6rem; padding-left: 1.2rem; position: relative; }
+        .store-page-scope .features li::before { content: "✓"; position: absolute; left: 0; color: var(--store-accent); font-weight: bold; }
+        .store-page-scope .card.golden .features li::before { color: var(--store-gold); }
+        .store-page-scope .card.event-flash .features li::before { color: var(--store-flash); }
+
+        .store-page-scope .btn {
+            width: 100%;
+            padding: 0.80rem;
+            border: none;
+            border-radius: 99px;
+            background: var(--store-accent);
+            color: #000;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .store-page-scope .btn:hover { transform: scale(1.03); }
+        .store-page-scope .card.golden .btn { background: var(--store-gold); }
+        .store-page-scope .card.event-flash .btn { background: var(--store-flash); color: #fff; }
+
+        .store-page-scope .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(12, 5, 5, 0.8);
+            border: 1px solid var(--store-border);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .store-page-scope .nav-btn.left { left: 10px; }
+        .store-page-scope .nav-btn.right { right: 10px; }
+
+        .store-page-scope .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5,2,2,0.9); display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .store-page-scope .modal {
+            background: #0c0505; padding: 2.5rem 2rem; border-radius: 20px; width: 90%; max-width: 380px;
+            border: 1px solid var(--store-border); text-align: center; color: #fff;
+        }
+        .store-page-scope .modal input {
+            width: 100%; padding: 0.8rem; margin: 1rem 0; border-radius: 8px; border: 1px solid var(--store-border);
+            background: #050202; color: #fff; text-align: center; font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="site-header"></div>
+
+    <header class="store-hero">
+        <h1>Official Webstore</h1>
+        <p>Support Grand Billionaire City Mobile and unlock exclusive in-game packages</p>
+    </header>
+
+    <main>
+        <div class="store-page-scope">
+            <div class="slider-wrapper">
+                <button class="nav-btn left" onclick="scrollSlider(-300)">❮</button>
+                <button class="nav-btn right" onclick="scrollSlider(300)">❯</button>
+
+                <div class="slider-track" id="slider-track">
+                    <!-- Pocket Change -->
+                    <div class="card" data-base-usd="0.49">
+                        <h3>Pocket Change</h3>
+                        <div class="price-box">
+                            <div class="price-amount" data-price>$0.49</div>
+                            <div class="price-usd">~$0.49 USD</div>
+                        </div>
+                        <ul class="features">
+                            <li>$150,000 In-Game Cash</li>
+                            <li>10x Vehicle Repair Kits</li>
+                            <li>Instant Level 2 Boost</li>
+                        </ul>
+                        <button class="btn" onclick="openCheckout('Pocket Change')">Buy Pack</button>
+                    </div>
+
+                    <!-- Street Racer -->
+                    <div class="card" data-base-usd="1.49">
+                        <h3>Street Racer</h3>
+                        <div class="price-box">
+                            <div class="price-amount" data-price>$1.49</div>
+                            <div class="price-usd">~$1.49 USD</div>
+                        </div>
+                        <ul class="features">
+                            <li>$500,000 In-Game Cash</li>
+                            <li>Custom License Plate (`/vplate`)</li>
+                            <li>7-Day Bronze VIP</li>
+                        </ul>
+                        <button class="btn" onclick="openCheckout('Street Racer')">Buy Pack</button>
+                    </div>
+
+                    <!-- EVENT OFFER -->
+                    <div class="card event-flash" id="event-card" data-base-usd="2.99">
+                        <div class="badge-label">🔥 WEEKEND EVENT</div>
+                        <h3 style="color: var(--store-flash);">Epic Trials Pass</h3>
+                        <div class="event-timer-mini">Ends Sunday: <span id="card-timer">00h 00m 00s</span></div>
+                        
+                        <div class="price-box">
+                            <span class="old-price">$12.00</span>
+                            <span class="price-amount" data-price>$2.99</span>
+                            <div class="price-usd">~$2.99 USD</div>
+                        </div>
+                        <ul class="features">
+                            <li><strong>Tier 1:</strong> VIP Vehicle + $500k Cash</li>
+                            <li><strong>Tier 2:</strong> Custom Tag + 2x Income</li>
+                            <li><strong>Tier 3:</strong> Mansion Plot + FREE Business</li>
+                            <li>🎁 <strong>Free Mystery Supply Crate!</strong></li>
+                        </ul>
+                        <button class="btn" onclick="openCheckout('Epic Trials Pass (Event)')">Claim Bundle</button>
+                    </div>
+
+                    <!-- Billionaire Pass -->
+                    <div class="card golden" data-base-usd="4.99">
+                        <div class="badge-label">Most Popular</div>
+                        <h3>Billionaire Pass</h3>
+                        <div class="price-box">
+                            <div class="price-amount" data-price>$4.99</div>
+                            <div class="price-usd">~$4.99 USD</div>
+                        </div>
+                        <ul class="features">
+                            <li>$3,500,000 In-Game Cash</li>
+                            <li>30-Day Gold VIP (Yellow Name)</li>
+                            <li>Exclusive Vehicle Token</li>
+                            <li>Priority Server Reserve Slot</li>
+                        </ul>
+                        <button class="btn" onclick="openCheckout('Billionaire Pass')">Get Pass</button>
+                    </div>
+
+                    <!-- Gang Founder -->
+                    <div class="card" data-base-usd="9.99">
+                        <h3>Gang Founder</h3>
+                        <div class="price-box">
+                            <div class="price-amount" data-price>$9.99</div>
+                            <div class="price-usd">~$9.99 USD</div>
+                        </div>
+                        <ul class="features">
+                            <li>Create Family/Gang (`/makefamily`)</li>
+                            <li>$10,000,000 In-Game Cash</li>
+                            <li>Permanent VIP Supreme</li>
+                            <li>Custom HQ / Turf Voucher</li>
+                        </ul>
+                        <button class="btn" onclick="openCheckout('Gang Founder')">Buy Package</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkout Modal -->
+            <div class="modal-overlay" id="checkout-modal">
+                <div class="modal">
+                    <h3 id="modal-item-title">Item Name</h3>
+                    <p style="color: var(--store-text-sub); font-size: 0.85rem; margin-top: 0.4rem;">Enter your SA-MP character name:</p>
+                    <input type="text" id="player-name" placeholder="John_Doe" />
+                    <button class="btn" onclick="proceedToPayment()">Proceed to Payment</button>
+                    <button class="btn" style="background: transparent; color: var(--store-text-sub); margin-top: 0.5rem;" onclick="closeCheckout()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="site-footer"></div>
+
+    <script src="script.js"></script>
+    <script>
+      (function() {
+        let activeCurrency = 'USD';
+        let exchangeRate = 1;
+        const track = document.getElementById('slider-track');
+
+        window.scrollSlider = function(amount) {
+          if (track) track.scrollBy({ left: amount, behavior: 'smooth' });
+        };
+
+        window.openCheckout = function(itemName) {
+          document.getElementById('modal-item-title').innerText = itemName;
+          document.getElementById('checkout-modal').style.display = 'flex';
+        };
+
+        window.closeCheckout = function() {
+          document.getElementById('checkout-modal').style.display = 'none';
+        };
+
+        window.proceedToPayment = function() {
+          const name = document.getElementById('player-name').value.trim();
+          if (!name || !name.includes('_')) {
+            alert('Please enter a valid username in Roleplay format (e.g., John_Doe)');
+            return;
+          }
+          alert(`Redirecting payment for player: ${name}`);
+          window.closeCheckout();
+        };
+
+        function startCardTimer() {
+          const now = new Date();
+          const eventEnd = new Date(now);
+          eventEnd.setDate(now.getDate() + (7 - now.getDay()) % 7);
+          eventEnd.setHours(23, 59, 59, 0);
+
+          function update() {
+            const diff = eventEnd.getTime() - new Date().getTime();
+            if (diff <= 0) return;
+
+            const hrs = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+            const mins = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+            const secs = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+
+            const timerEl = document.getElementById('card-timer');
+            if (timerEl) timerEl.innerText = `${hrs}h ${mins}m ${secs}s`;
+          }
+          update();
+          setInterval(update, 1000);
+        }
+
+        async function initCurrency() {
+          try {
+            const geoRes = await fetch('https://ipapi.co/json/');
+            const geoData = await geoRes.json();
+            const userCurr = geoData.currency || 'USD';
+
+            if (userCurr !== 'USD') {
+              const rateRes = await fetch(`https://open.er-api.com/v6/latest/USD`);
+              const rateData = await rateRes.json();
+              if (rateData.rates && rateData.rates[userCurr]) {
+                exchangeRate = rateData.rates[userCurr];
+                activeCurrency = userCurr;
+                updatePrices();
+              }
+            }
+          } catch (err) {
+            console.log("Currency API default: USD");
+          }
+        }
+
+        function updatePrices() {
+          document.querySelectorAll('.store-page-scope .card').forEach(card => {
+            const baseUSD = parseFloat(card.getAttribute('data-base-usd'));
+            if (baseUSD) {
+              const localPrice = (baseUSD * exchangeRate).toLocaleString(undefined, {
+                style: 'currency', currency: activeCurrency, maximumFractionDigits: 2
+              });
+              const priceEl = card.querySelector('[data-price]');
+              if (priceEl) priceEl.innerText = localPrice;
+            }
+          });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          const eventCard = document.getElementById('event-card');
+          if (eventCard && track) {
+            const offset = eventCard.offsetLeft - (track.clientWidth / 2) + (eventCard.clientWidth / 2);
+            track.scrollTo({ left: offset, behavior: 'smooth' });
+          }
+          initCurrency();
+          startCardTimer();
+        });
+      })();
+    </script>
+</body>
+</html>
