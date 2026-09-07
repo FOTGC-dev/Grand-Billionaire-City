@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Account | GBC</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <a href="index.html" class="logo">
+    <span>GBC</span>
+    <small>GRAND BILLIONAIRE CITY</small>
+  </a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="index.html#store">Store</a>
+    <a href="account.html">My Account</a>
+    <a href="#" id="logout-link">Logout</a>
+  </nav>
+</header>
+
+<main class="account-page">
+  <div class="account-header">
+    <div>
+      <span class="eyebrow">PLAYER ACCOUNT</span>
+      <h1>Welcome, <span id="account-username">Player</span>.</h1>
+      <p>Manage your account and track your GBC purchases.</p>
+    </div>
+  </div>
+
+  <div id="account-message" class="form-message" role="alert"></div>
+
+  <section class="account-grid">
+
+    <div class="account-card">
+      <span class="eyebrow">ACCOUNT DETAILS</span>
+      <h2>Your profile</h2>
+
+      <div class="profile-details">
+        <div>
+          <span>Username</span>
+          <strong id="profile-username">Loading...</strong>
+        </div>
+        <div>
+          <span>Email</span>
+          <strong id="profile-email">Loading...</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="account-card">
+      <span class="eyebrow">PURCHASE</span>
+      <h2>Buy something</h2>
+      <p>Choose an item from the marketplace.</p>
+      <a href="index.html#store" class="btn btn-primary">
+        Explore Store
+      </a>
+    </div>
+
+  </section>
+
+  <section class="account-card orders-section">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">ORDER HISTORY</span>
+        <h2>Your orders</h2>
+      </div>
+      <button id="refresh-orders" class="btn btn-secondary">
+        Refresh
+      </button>
+    </div>
+
+    <div id="orders-list">
+      <div class="loading">Loading orders...</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="logo">
+    <span>GBC</span>
+    <small>GRAND BILLIONAIRE CITY</small>
+  </div>
+  <p>© 2026 Grand Billionaire City. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>
