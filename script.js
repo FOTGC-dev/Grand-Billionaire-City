@@ -121,6 +121,7 @@ function toggleCartDrawer() {
     if(drawer) drawer.classList.toggle('open');
 }
 
+// Enhanced WhatsApp Checkout Invoice System
 function checkoutCartWhatsApp() {
     const cart = getCart();
     if (cart.length === 0) {
@@ -129,10 +130,22 @@ function checkoutCartWhatsApp() {
     }
 
     const orderId = 'GBC-' + Math.floor(100000 + Math.random() * 900000);
-    let itemsText = cart.map(i => `• ${i.title} (${i.price})`).join('\n');
+    const loggedUser = sessionStorage.getItem('gbc_logged_in_user') || 'Guest Player';
+    let itemsText = cart.map(i => `• ${i.title} [${i.price}]`).join('\n');
     
-    const message = `Hello Grand Billionaire City Support, I would like to check out the following items:\n\n${itemsText}\n\n🆔 Order ID: ${orderId}\n\nPlease provide payment details.`;
+    // Save to order logs for admin panel
+    const orders = JSON.parse(localStorage.getItem('gbc_order_logs') || '[]');
+    orders.unshift({ orderId, user: loggedUser, items: cart, date: new Date().toLocaleTimeString() });
+    localStorage.setItem('gbc_order_logs', JSON.stringify(orders));
+
+    const message = `🛒 *GRAND BILLIONAIRE CITY - INVOICE* 🛒\n\n🆔 *Order ID:* ${orderId}\n👤 *Customer:* ${loggedUser}\n\n*Ordered Items:*\n${itemsText}\n\n📌 Please verify payment and dispatch items in-game!`;
     const encoded = encodeURIComponent(message);
+    
+    // Clear cart after checkout trigger
+    localStorage.removeItem('gbc_cart_items');
+    updateCartUI();
+    toggleCartDrawer();
+
     window.open(`https://wa.me/2348000000000?text=${encoded}`, '_blank');
 }
 
@@ -179,7 +192,15 @@ function renderChatBox() {
     body.scrollTop = body.scrollHeight;
 }
 
-// Admin Support Panel Logic
+// Admin Panel Tab Switching & Features
+function switchPanelTab(tabName, btnEl) {
+    document.querySelectorAll('.panel-section').forEach(sec => sec.style.display = 'none');
+    document.querySelectorAll('.tab-selector .tab-btn').forEach(btn => btn.classList.remove('active'));
+
+    document.getElementById(`panelTab-${tabName}`).style.display = 'block';
+    if(btnEl) btnEl.classList.add('active');
+}
+
 function loadAdminChatSession() {
     const log = document.getElementById('adminChatLog');
     if(!log) return;
@@ -210,7 +231,32 @@ function handleAdminEnter(e) {
     if(e.key === 'Enter') sendAdminReply();
 }
 
-// Authentication & Panel Code
+function loadOrderLogs() {
+    const container = document.getElementById('orderLogsContainer');
+    if(!container) return;
+
+    const orders = JSON.parse(localStorage.getItem('gbc_order_logs') || '[]');
+    if (orders.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No orders recorded yet.</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    orders.forEach(ord => {
+        const box = document.createElement('div');
+        box.style.background = '#0a0a0a';
+        box.style.border = '1px solid var(--card-border)';
+        box.style.padding = '12px';
+        box.style.borderRadius = '8px';
+        box.style.fontSize = '0.85rem';
+
+        let itemsSummary = ord.items.map(i => `${i.title} (${i.price})`).join(', ');
+        box.innerHTML = `<strong>ID:</strong> ${ord.orderId} | <strong>User:</strong> ${ord.user} <span style="float: right; color: var(--text-muted);">${ord.date}</span><br><span style="color: var(--accent-gold);">Items:</span> ${itemsSummary}`;
+        container.appendChild(box);
+    });
+}
+
+// Authentication & Panel Routing
 function switchAuthTab(tab) {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -287,7 +333,7 @@ function checkUserAuth() {
         if(authScreen) authScreen.style.display = 'none';
         if(panelScreen) panelScreen.style.display = 'block';
         if(logoutBtn) logoutBtn.style.display = 'block';
-        if(welcomeBanner) welcomeBanner.innerText = `Logged in as: ${loggedUser}`;
+        if(welcomeBanner) welcomeBanner.innerText = `Logged in: ${loggedUser}`;
     } else {
         if(authScreen) authScreen.style.display = 'block';
         if(panelScreen) panelScreen.style.display = 'none';
@@ -343,5 +389,5 @@ function saveNewItem(category, newItem) {
     localStorage.setItem('gbc_store_data_categorized', JSON.stringify(data));
     alert('Item successfully published to marketplace category!');
     document.getElementById('uploadForm').reset();
-                                                }
-        
+                 }
+            
