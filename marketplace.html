@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Billionaire City - Store</title>
+    <title>GBC - Marketplace & Store</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -12,84 +12,24 @@
     <nav>
         <div class="nav-brand">
             <span class="brand-badge">GBC</span>
-            <span class="brand-title">GRAND BILLIONAIRE CITY</span>
+            <span class="brand-title">STOREFRONT</span>
         </div>
         <div class="nav-actions">
-            <a href="index.html" class="btn-nav btn-nav-outline">HOME</a>
-            <a href="profile.html" class="btn-nav btn-nav-outline" id="profileLinkNavStore" style="display:none;"><i class="fa-solid fa-user"></i> PROFILE</a>
-            <a href="https://wa.me/2348000000000" target="_blank" class="btn-whatsapp-icon" title="WhatsApp Support"><i class="fa-brands fa-whatsapp"></i></a>
-            <button class="btn-nav btn-cart-nav" onclick="toggleCartDrawer()">
-                <i class="fa-solid fa-cart-shopping"></i> CART <span class="cart-badge-count" id="cartCount">0</span>
-            </button>
+            <a href="index.php" class="btn-nav">HOME PORTAL</a>
         </div>
     </nav>
 
-    <div class="page-view">
-        <div class="hero">
-            <span class="badge-tag">GC COIN OFFICIAL • GLOBAL STORE</span>
-            <h1>MARKETPLACE STORE</h1>
-            <p>Add items to your cart and checkout seamlessly with formatted automated invoices directly through WhatsApp.</p>
-        </div>
-
-        <div class="section-title">🪙 BUY GC COIN</div>
-        <div class="grid-cards" id="coins-grid"></div>
-
-        <div class="section-title">👑 DONATOR TIERS</div>
-        <div class="grid-cards" id="donators-grid"></div>
-
-        <div class="section-title">🏠 PROPERTY LISTINGS</div>
-        <div class="grid-cards" id="properties-grid"></div>
-
-        <div class="section-title">🏢 BUSINESS PROPERTIES</div>
-        <div class="grid-cards" id="business-grid"></div>
-
-        <div class="section-title">🚗 VEHICLE COLLECTION</div>
-        <div class="grid-cards" id="vehicles-grid"></div>
-    </div>
-
-    <!-- CART SIDE DRAWER MODAL -->
-    <div class="cart-modal" id="cartDrawer">
-        <div class="cart-header">
-            <h3>Your Shopping Cart</h3>
-            <button class="btn-nav btn-nav-outline" onclick="toggleCartDrawer()">✕</button>
-        </div>
-        <div class="cart-items-list" id="cartItemsList">
-            <p style="color: var(--text-muted); text-align: center; margin-top: 20px;">Your cart is empty.</p>
-        </div>
-        <div style="border-top: 1px solid var(--card-border); padding-top: 15px; margin-top: 15px;">
-            <button class="btn-primary btn-whatsapp" onclick="checkoutCartWhatsApp()">CHECKOUT ON WHATSAPP</button>
+    <div class="page-view" style="max-width: 900px; margin-top: 30px;">
+        <h2 style="color: var(--accent-gold); margin-bottom: 20px; text-align: center;">Grand Billionaire City Marketplace</h2>
+        <div id="liveMarketplaceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px;">
+            <!-- Dynamically populated from script.js store data -->
         </div>
     </div>
-
-    <!-- LIVE SUPPORT WIDGET -->
-    <button class="support-widget-btn" onclick="toggleSupportChat()"><i class="fa-solid fa-headset"></i></button>
-    <div class="support-chat-box" id="supportChatBox">
-        <div class="support-chat-header">
-            <span>Live Support Assistant</span>
-            <button class="btn-nav btn-nav-outline" style="padding: 2px 6px; font-size: 0.75rem;" onclick="toggleSupportChat()">✕</button>
-        </div>
-        <div class="support-chat-body" id="supportChatBody">
-            <div class="chat-bubble admin">Hello! How can we assist you with your order today?</div>
-        </div>
-        <div class="support-chat-footer">
-            <input type="text" id="chatInputMsg" placeholder="Type message..." onkeypress="handleChatEnter(event)">
-            <button class="btn-primary" style="width: auto; padding: 8px 12px;" onclick="sendUserChatMessage()">Send</button>
-        </div>
-    </div>
-
-    <footer>
-        <p>© 2022-2026 GRAND BILLIONAIRE CITY • OFFICIAL STORE</p>
-    </footer>
 
     <script src="script.js"></script>
     <script>
         window.onload = () => {
-            renderMarketplace();
-            updateCartUI();
-            const logged = sessionStorage.getItem('gbc_logged_in_user');
-            if (logged && document.getElementById('profileLinkNavStore')) {
-                document.getElementById('profileLinkNavStore').style.display = 'inline-flex';
-            }
+            renderMarketplaceStorefront();
         };
     </script>
 </body>
