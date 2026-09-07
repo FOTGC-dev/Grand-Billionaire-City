@@ -16,6 +16,7 @@
         </div>
         <div class="nav-actions">
             <a href="index.html" class="btn-nav btn-nav-outline">HOME</a>
+            <a href="profile.html" class="btn-nav btn-nav-outline" id="profileLinkNavStore" style="display:none;"><i class="fa-solid fa-user"></i> PROFILE</a>
             <a href="https://wa.me/2348000000000" target="_blank" class="btn-whatsapp-icon" title="Direct WhatsApp Support"><i class="fa-brands fa-whatsapp"></i></a>
             <button class="btn-nav btn-cart-nav" onclick="toggleCartDrawer()">
                 <i class="fa-solid fa-cart-shopping"></i> CART <span class="cart-badge-count" id="cartCount">0</span>
@@ -24,28 +25,24 @@
     </nav>
 
     <div class="page-view">
-        <div class="hero" style="background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=80') center/cover;">
-            <span class="badge-tag">GC COIN OFFICIAL • GLOBAL STORE • EST 2022</span>
-            <h1>GRAND BILLIONAIRE CITY</h1>
-            <p>Official store. Add items to your cart and checkout directly via WhatsApp. Rate: 1 GC = 400 NGN = $0.27. Global payments supported worldwide.</p>
+        <div class="hero">
+            <span class="badge-tag">GC COIN OFFICIAL • GLOBAL STORE</span>
+            <h1>MARKETPLACE STORE</h1>
+            <p>Add items to your cart and checkout seamlessly with formatted automated invoices directly through WhatsApp.</p>
         </div>
 
         <div class="section-title">🪙 BUY GC COIN</div>
         <div class="grid-cards" id="coins-grid"></div>
 
-        <div class="section-title">👑 DONATOR TIERS <span class="badge-tag" style="margin: 0;">GC COIN ONLY</span></div>
+        <div class="section-title">👑 DONATOR TIERS</div>
         <div class="grid-cards" id="donators-grid"></div>
 
-        <div class="section-title">🏠 PROPERTY LISTINGS <span class="badge-tag" style="margin: 0;">GC COIN • SECURED</span></div>
+        <div class="section-title">🏠 PROPERTY LISTINGS</div>
         <div class="grid-cards" id="properties-grid"></div>
 
         <div class="section-title">🏢 BUSINESS PROPERTIES</div>
         <div class="grid-cards" id="business-grid"></div>
 
-        <div class="info-banner">
-            <span class="badge-tag" style="background: rgba(255,59,48,0.2); color: var(--accent-red);">UPDATED</span>
-            <p style="font-size: 0.9rem; margin-top: 5px; color: #ccc;">All vehicle prices in GC COIN • Game Value × 0.45 GC • 10% OFF Applied<br>Rate: 1 GC = 400 NGN | 1 GC = $0.27</p>
-        </div>
         <div class="section-title">🚗 VEHICLE COLLECTION</div>
         <div class="grid-cards" id="vehicles-grid"></div>
     </div>
@@ -72,7 +69,7 @@
             <button class="btn-nav btn-nav-outline" style="padding: 2px 6px; font-size: 0.75rem;" onclick="toggleSupportChat()">✕</button>
         </div>
         <div class="support-chat-body" id="supportChatBody">
-            <div class="chat-bubble admin">Hello! How can we assist you with your Grand Billionaire City order today?</div>
+            <div class="chat-bubble admin">Hello! How can we assist you with your order today?</div>
         </div>
         <div class="support-chat-footer">
             <input type="text" id="chatInputMsg" placeholder="Type message..." onkeypress="handleChatEnter(event)">
@@ -81,7 +78,7 @@
     </div>
 
     <footer>
-        <p>© 2022-2026 GRAND BILLIONAIRE CITY • GC COIN OFFICIAL • GLOBAL STORE • WORLDWIDE</p>
+        <p>© 2022-2026 GRAND BILLIONAIRE CITY • OFFICIAL STORE</p>
     </footer>
 
     <script src="script.js"></script>
@@ -89,6 +86,10 @@
         window.onload = () => {
             renderMarketplace();
             updateCartUI();
+            const logged = sessionStorage.getItem('gbc_logged_in_user');
+            if (logged && document.getElementById('profileLinkNavStore')) {
+                document.getElementById('profileLinkNavStore').style.display = 'inline-flex';
+            }
         };
     </script>
 </body>
