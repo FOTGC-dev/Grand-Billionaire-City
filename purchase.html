@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase | GBC</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <a href="index.html" class="logo">
+    <span>GBC</span>
+    <small>GRAND BILLIONAIRE CITY</small>
+  </a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="index.html#store">Store</a>
+    <a href="account.html">My Account</a>
+    <a href="#" id="logout-link">Logout</a>
+  </nav>
+</header>
+
+<main class="purchase-page">
+  <div class="purchase-header">
+    <span class="eyebrow">GBC MARKETPLACE</span>
+    <h1>Complete your purchase.</h1>
+    <p>Choose an item, make your payment, and upload your receipt.</p>
+  </div>
+
+  <div id="purchase-message" class="form-message" role="alert"></div>
+
+  <div class="purchase-grid">
+
+    <section class="account-card">
+      <span class="eyebrow">SELECT ITEM</span>
+      <h2>Your purchase</h2>
+
+      <form id="purchase-form">
+
+        <label for="purchase-item">Item</label>
+        <select id="purchase-item" required>
+          <option value="">Loading items...</option>
+        </select>
+
+        <div id="selected-item" class="selected-item"></div>
+
+        <label for="purchase-receipt">Payment Receipt</label>
+        <input
+          id="purchase-receipt"
+          type="file"
+          accept="image/*,.pdf"
+          required
+        >
+
+        <small class="input-help">
+          Upload a clear image or PDF of your payment receipt.
+        </small>
+
+        <button type="submit" class="btn btn-primary auth-submit">
+          Submit Order
+        </button>
+
+      </form>
+    </section>
+
+    <section class="account-card payment-card">
+      <span class="eyebrow">PAYMENT DETAILS</span>
+      <h2>Make your payment</h2>
+      <p>Transfer the exact amount to the account below.</p>
+
+      <div class="bank-details">
+        <div>
+          <span>Bank Name</span>
+          <strong id="bank-name">Loading...</strong>
+        </div>
+
+        <div>
+          <span>Account Number</span>
+          <strong id="bank-account">Loading...</strong>
+        </div>
+
+        <div>
+          <span>Account Name</span>
+          <strong id="bank-account-name">Loading...</strong>
+        </div>
+      </div>
+
+      <div class="payment-note">
+        <strong>Important</strong>
+        <p>
+          Your order will remain pending until a staff member
+          verifies your payment.
+        </p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="logo">
+    <span>GBC</span>
+    <small>GRAND BILLIONAIRE CITY</small>
+  </div>
+  <p>© 2026 Grand Billionaire City. All rights reserved.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>
