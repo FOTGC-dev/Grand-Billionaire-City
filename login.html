@@ -1,20 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>GBC - Player Portal</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Login | GBC</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="auth-body">
+<body>
+
+  <header class="navbar">
+    <a href="index.html" class="logo">
+      <span>GBC</span>
+      <small>GRAND BILLIONAIRE CITY</small>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="index.html#store">Store</a>
+      <a href="login.html">Player Login</a>
+    </nav>
+  </header>
+
+  <main class="auth-page">
     <div class="auth-card">
-        <h2>Player Portal</h2>
-        <form onsubmit="handleUserLogin(event)">
-            <label>Username or Email</label><input type="text" id="loginUser" required>
-            <label>Password</label><input type="password" id="loginPass" required>
-            <button type="submit" class="btn-primary" style="margin-top:15px;">LOGIN</button>
-        </form>
+      <span class="eyebrow">PLAYER ACCESS</span>
+      <h1>Welcome back.</h1>
+      <p class="auth-subtitle">Log in to your Grand Billionaire City account.</p>
+
+      <div id="login-message" class="form-message" role="alert"></div>
+
+      <form id="login-form">
+        <label for="login-identifier">Username or Email</label>
+        <input
+          id="login-identifier"
+          type="text"
+          placeholder="Enter username or email"
+          required
+          autocomplete="username"
+        >
+
+        <label for="login-password">Password</label>
+        <input
+          id="login-password"
+          type="password"
+          placeholder="Enter your password"
+          required
+          autocomplete="current-password"
+        >
+
+        <button type="submit" class="btn btn-primary auth-submit">
+          Log In
+        </button>
+      </form>
+
+      <p class="auth-footer">
+        Don't have an account?
+        <a href="register.html">Create one</a>
+      </p>
     </div>
-    <script src="script.js"></script>
+  </main>
+
+  <footer>
+    <div class="logo">
+      <span>GBC</span>
+      <small>GRAND BILLIONAIRE CITY</small>
+    </div>
+    <p>© 2026 Grand Billionaire City. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
 </body>
 </html>
