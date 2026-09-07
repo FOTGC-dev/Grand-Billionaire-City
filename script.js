@@ -1,33 +1,52 @@
 const SUPABASE_URL =
   "https://blmpsybqewgbvmqjajmc.supabase.co";
 
-const SUPABASE_KEY =
+const SUPABASE_ANON_KEY =
   "Sb_publishable_3q_HCgN5TEmaSjO6luPbwA_rXE6CLHx";
 
-const supabaseClient = supabase.createClient(
+const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_KEY
+  SUPABASE_ANON_KEY
 );
 
 
-// ---------- HELPERS ----------
+/* =========================
+   GENERAL HELPERS
+========================= */
 
-function createText(tag, text, className = "") {
-  const element = document.createElement(tag);
-  element.textContent = text ?? "";
-
-  if (className) {
-    element.className = className;
-  }
-
-  return element;
+function getElement(id) {
+  return document.getElementById(id);
 }
 
-function showMessage(element, message, type) {
+function showMessage(id, message, type = "") {
+  const element = getElement(id);
+
   if (!element) return;
 
   element.textContent = message;
-  element.className = `form-message show ${type}`;
+  element.className = `form-message ${type}`;
+}
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatPrice(price) {
+  return `₦${Number(price || 0).toLocaleString("en-NG")}`;
+}
+
+function createOrderId() {
+  const randomPart = Math.random()
+    .toString(36)
+    .substring(2, 8)
+    .toUpperCase();
+
+  return `GBC-${Date.now()}-${randomPart}`;
 }
 
 async function getCurrentSession() {
@@ -35,7 +54,7 @@ async function getCurrentSession() {
     await supabaseClient.auth.getSession();
 
   if (error) {
-    console.error("Session error:", error);
+    console.error(error);
     return null;
   }
 
@@ -43,286 +62,239 @@ async function getCurrentSession() {
 }
 
 
-// ---------- STORE ----------
-
-function getStoreIcon(category) {
-  if (category === "coins") return "◈";
-  if (category === "vehicles") return "▣";
-  if (category === "properties") return "⌂";
-
-  return "◆";
-}
+/* =========================
+   PUBLIC STORE
+========================= */
 
 async function loadStore() {
-  const grid = document.getElementById("store-grid");
+  const storeGrid = getElement("store-grid");
 
-  if (!grid) return;
+  if (!storeGrid) return;
+
+  storeGrid.innerHTML = "<p>Loading store items...</p>";
 
   const { data, error } = await supabaseClient
     .from("store_items")
-    .select("id, category, title, price, tag, description")
+    .select("*")
     .eq("active", true)
-    .order("id");
+    .order("id", { ascending: true });
 
   if (error) {
-    console.error("Store loading error:", error);
-
-    grid.replaceChildren(
-      createText(
-        "div",
-        "Store is temporarily unavailable.",
-        "loading"
-      )
-    );
-
+    console.error(error);
+    storeGrid.innerHTML =
+      "<p>Unable to load store items.</p>";
     return;
   }
-
-  grid.replaceChildren();
 
   if (!data || data.length === 0) {
-    grid.appendChild(
-      createText(
-        "div",
-        "No items available yet.",
-        "loading"
-      )
-    );
-
+    storeGrid.innerHTML =
+      "<p>No store items are available right now.</p>";
     return;
   }
 
-  data.forEach(item => {
+  storeGrid.innerHTML = "";
+
+  data.forEach((item) => {
     const card = document.createElement("article");
+
     card.className = "store-card";
 
-    const icon = createText(
-      "div",
-      getStoreIcon(item.category),
-      "store-icon"
-    );
+    card.innerHTML = `
+      <p class="store-tag">
+        ${escapeHTML(item.tag || item.category || "GBC")}
+      </p>
 
-    const tag = createText(
-      "span",
-      item.tag || item.category,
-      "store-tag"
-    );
+      <h3>${escapeHTML(item.title)}</h3>
 
-    const title = createText("h3", item.title);
+      <p class="store-description">
+        ${escapeHTML(item.description || "")}
+      </p>
 
-    const description = createText(
-      "p",
-      item.description || "Available in the GBC marketplace."
-    );
+      <strong class="store-price">
+        ${formatPrice(item.price)}
+      </strong>
 
-    const price = createText(
-      "span",
-      `${item.price} GC`,
-      "price"
-    );
+      <a
+        class="primary-button"
+        href="purchase.html?item=${encodeURIComponent(item.id)}"
+      >
+        Purchase
+      </a>
+    `;
 
-    const button = createText(
-      "a",
-      "Purchase",
-      "btn btn-primary"
-    );
-
-    button.href = "purchase.html";
-
-    const priceRow = document.createElement("div");
-    priceRow.className = "store-price";
-
-    priceRow.append(price, button);
-
-    card.append(
-      icon,
-      tag,
-      title,
-      description,
-      priceRow
-    );
-
-    grid.appendChild(card);
+    storeGrid.appendChild(card);
   });
 }
 
 
-// ---------- LOGIN ----------
+/* =========================
+   PLAYER LOGIN
+========================= */
 
 async function handleLogin(event) {
   event.preventDefault();
 
-  const identifier = document
-    .getElementById("login-identifier")
-    .value
-    .trim();
+  const loginInput = getElement("login");
+  const passwordInput = getElement("password");
 
-  const password = document
-    .getElementById("login-password")
-    .value;
+  if (!loginInput || !passwordInput) return;
 
-  const message = document.getElementById("login-message");
-  const button = event.target.querySelector("button");
+  const login = loginInput.value.trim();
+  const password = passwordInput.value;
 
-  button.disabled = true;
-  button.textContent = "Logging in...";
-  message.className = "form-message";
-
-  try {
-    const { data: email, error: resolveError } =
-      await supabaseClient.rpc(
-        "get_login_email",
-        {
-          login_identifier: identifier
-        }
-      );
-
-    if (resolveError) {
-      throw new Error(
-        "Unable to resolve login identifier."
-      );
-    }
-
-    if (!email) {
-      throw new Error(
-        "Invalid username or email."
-      );
-    }
-
-    const { error: loginError } =
-      await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
-
-    if (loginError) {
-      throw new Error(loginError.message);
-    }
-
+  if (!login || !password) {
     showMessage(
-      message,
-      "Login successful. Redirecting...",
-      "success"
+      "login-message",
+      "Enter your login details.",
+      "error"
+    );
+    return;
+  }
+
+  showMessage(
+    "login-message",
+    "Signing in..."
+  );
+
+  let email = login;
+
+  if (!login.includes("@")) {
+    const { data, error } = await supabaseClient.rpc(
+      "get_login_email",
+      {
+        login_identifier: login
+      }
     );
 
-    setTimeout(() => {
-      window.location.href = "account.html";
-    }, 800);
+    if (error || !data) {
+      showMessage(
+        "login-message",
+        "Username not found.",
+        "error"
+      );
+      return;
+    }
 
-  } catch (error) {
-    console.error("Login error:", error);
+    email = data;
+  }
 
+  const { error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
     showMessage(
-      message,
+      "login-message",
       error.message,
       "error"
     );
-
-  } finally {
-    button.disabled = false;
-    button.textContent = "Log In";
+    return;
   }
+
+  window.location.href = "account.html";
 }
 
 
-// ---------- REGISTRATION ----------
+/* =========================
+   PLAYER REGISTRATION
+========================= */
 
 async function handleRegister(event) {
   event.preventDefault();
 
-  const username = document
-    .getElementById("register-username")
-    .value
-    .trim();
+  const usernameInput = getElement("register-username");
+  const emailInput = getElement("register-email");
+  const passwordInput = getElement("register-password");
+  const confirmInput = getElement("register-confirm-password");
 
-  const email = document
-    .getElementById("register-email")
-    .value
-    .trim();
-
-  const password = document
-    .getElementById("register-password")
-    .value;
-
-  const message = document.getElementById("register-message");
-  const button = event.target.querySelector("button");
-
-  if (username.length < 3) {
-    showMessage(
-      message,
-      "Username must be at least 3 characters.",
-      "error"
-    );
-
+  if (
+    !usernameInput ||
+    !emailInput ||
+    !passwordInput ||
+    !confirmInput
+  ) {
     return;
   }
 
-  button.disabled = true;
-  button.textContent = "Creating account...";
-  message.className = "form-message";
+  const username = usernameInput.value.trim();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const confirmPassword = confirmInput.value;
 
-  try {
-    const { data, error } =
-      await supabaseClient.auth.signUp({
-        email,
-        password,
-
-        options: {
-          data: {
-            username
-          }
-        }
-      });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    if (data.session) {
-      showMessage(
-        message,
-        "Account created. Redirecting...",
-        "success"
-      );
-
-      setTimeout(() => {
-        window.location.href = "account.html";
-      }, 800);
-
-    } else {
-      showMessage(
-        message,
-        "Account created. Check your email to confirm your account.",
-        "success"
-      );
-    }
-
-  } catch (error) {
-    console.error("Registration error:", error);
-
+  if (password !== confirmPassword) {
     showMessage(
-      message,
+      "register-message",
+      "Passwords do not match.",
+      "error"
+    );
+    return;
+  }
+
+  if (password.length < 6) {
+    showMessage(
+      "register-message",
+      "Password must be at least 6 characters.",
+      "error"
+    );
+    return;
+  }
+
+  showMessage(
+    "register-message",
+    "Creating account..."
+  );
+
+  const { data, error } =
+    await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username
+        }
+      }
+    });
+
+  if (error) {
+    showMessage(
+      "register-message",
       error.message,
       "error"
     );
-
-  } finally {
-    button.disabled = false;
-    button.textContent = "Create Account";
+    return;
   }
+
+  if (data.session) {
+    window.location.href = "account.html";
+    return;
+  }
+
+  showMessage(
+    "register-message",
+    "Registration successful. Check your email if confirmation is required.",
+    "success"
+  );
 }
 
 
-// ---------- ACCOUNT ----------
+/* =========================
+   PLAYER ACCOUNT
+========================= */
 
-async function loadAccount() {
-  const usernameElement =
-    document.getElementById("account-username");
+async function loadAccountPage() {
+  const usernameElement = getElement("account-username");
+  const profileUsername = getElement("profile-username");
+  const profileEmail = getElement("profile-email");
 
-  if (!usernameElement) return;
-
-  const message =
-    document.getElementById("account-message");
+  if (
+    !usernameElement &&
+    !profileUsername &&
+    !profileEmail
+  ) {
+    return;
+  }
 
   const session = await getCurrentSession();
 
@@ -336,354 +308,212 @@ async function loadAccount() {
   const { data: profile, error } =
     await supabaseClient
       .from("profiles")
-      .select("username, email")
+      .select("*")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
   if (error) {
-    console.error("Profile loading error:", error);
-
-    showMessage(
-      message,
-      "Unable to load your profile.",
-      "error"
-    );
-
-    return;
+    console.error(error);
   }
 
-  usernameElement.textContent =
-    profile.username || "Player";
+  const username =
+    profile?.username ||
+    user.user_metadata?.username ||
+    "Player";
 
-  document.getElementById("profile-username")
-    .textContent = profile.username || "Player";
+  if (usernameElement) {
+    usernameElement.textContent = username;
+  }
 
-  document.getElementById("profile-email")
-    .textContent = profile.email || user.email || "";
+  if (profileUsername) {
+    profileUsername.textContent = username;
+  }
 
-  await loadOrders(user.id);
+  if (profileEmail) {
+    profileEmail.textContent = user.email || "";
+  }
+
+  await loadPlayerOrders(user.id);
 }
 
+async function loadPlayerOrders(userId) {
+  const ordersList = getElement("orders-list");
 
-// ---------- ORDERS ----------
+  if (!ordersList) return;
 
-async function loadOrders(userId) {
-  const list = document.getElementById("orders-list");
+  ordersList.innerHTML = "<p>Loading orders...</p>";
 
-  if (!list) return;
-
-  const { data, error } =
-    await supabaseClient
-      .from("orders")
-      .select("id, order_id, item_title, item_price, receipt_path, status")
-      .eq("user_id", userId)
-      .order("id", { ascending: false });
+  const { data, error } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("user_id", userId)
+    .order("id", { ascending: false });
 
   if (error) {
-    console.error("Orders loading error:", error);
-
-    list.replaceChildren(
-      createText(
-        "div",
-        "Unable to load your orders.",
-        "loading"
-      )
-    );
-
+    console.error(error);
+    ordersList.innerHTML =
+      "<p>Unable to load your orders.</p>";
     return;
   }
-
-  list.replaceChildren();
 
   if (!data || data.length === 0) {
-    list.appendChild(
-      createText(
-        "div",
-        "You have no orders yet.",
-        "loading"
-      )
-    );
-
+    ordersList.innerHTML =
+      "<p>You have not made any purchases yet.</p>";
     return;
   }
 
-  data.forEach(order => {
-    const card = document.createElement("div");
+  ordersList.innerHTML = "";
+
+  data.forEach((order) => {
+    const card = document.createElement("article");
+
+    const status = String(
+      order.status || "pending"
+    ).toLowerCase();
+
     card.className = "order-card";
 
-    const top = document.createElement("div");
-    top.className = "order-top";
+    card.innerHTML = `
+      <h3>${escapeHTML(order.item_title)}</h3>
 
-    const title = createText(
-      "h3",
-      order.item_title || "GBC Purchase"
-    );
+      <div class="order-meta">
+        <span>Order ID: ${escapeHTML(order.order_id)}</span>
+        <span>${formatPrice(order.item_price)}</span>
+      </div>
 
-    const orderNumber = createText(
-      "p",
-      `Order ID: ${order.order_id || order.id}`
-    );
+      <p>
+        Status:
+        <strong class="order-status status-${escapeHTML(status)}">
+          ${escapeHTML(status.toUpperCase())}
+        </strong>
+      </p>
+    `;
 
-    const status = createText(
-      "span",
-      order.status || "pending",
-      `order-status status-${order.status || "pending"}`
-    );
-
-    const heading = document.createElement("div");
-    heading.append(title, orderNumber);
-
-    top.append(heading, status);
-
-    const meta = document.createElement("div");
-    meta.className = "order-meta";
-
-    const priceBox = document.createElement("div");
-    priceBox.append(
-      createText("span", "Price"),
-      createText("strong", `${order.item_price} GC`)
-    );
-
-    const receiptBox = document.createElement("div");
-    receiptBox.append(
-      createText("span", "Receipt"),
-      createText(
-        "strong",
-        order.receipt_path ? "Uploaded" : "Not uploaded"
-      )
-    );
-
-    meta.append(priceBox, receiptBox);
-
-    card.append(top, meta);
-
-    if (!order.receipt_path &&
-        order.status === "pending") {
-
-      const form = document.createElement("form");
-      form.className = "receipt-form";
-
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/*,.pdf";
-      input.required = true;
-
-      const button = createText(
-        "button",
-        "Upload Receipt",
-        "btn btn-primary"
-      );
-
-      button.type = "submit";
-
-      form.append(input, button);
-
-      form.addEventListener("submit", async event => {
-        event.preventDefault();
-
-        await uploadReceipt(
-          order,
-          input,
-          button
-        );
-      });
-
-      card.appendChild(form);
-    }
-
-    list.appendChild(card);
+    ordersList.appendChild(card);
   });
 }
 
 
-// ---------- RECEIPT UPLOAD ----------
-
-async function uploadReceipt(order, input, button) {
-  const file = input.files[0];
-
-  if (!file) return;
-
-  const session = await getCurrentSession();
-
-  if (!session) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  button.disabled = true;
-  button.textContent = "Uploading...";
-
-  try {
-    const safeName = file.name.replace(
-      /[^a-zA-Z0-9._-]/g,
-      "_"
-    );
-
-    const path =
-      `${session.user.id}/${order.order_id}-${safeName}`;
-
-    const { error: uploadError } =
-      await supabaseClient.storage
-        .from("receipts")
-        .upload(path, file, {
-          upsert: false
-        });
-
-    if (uploadError) {
-      throw new Error(uploadError.message);
-    }
-
-    const { error: updateError } =
-      await supabaseClient
-        .from("orders")
-        .update({
-          receipt_path: path
-        })
-        .eq("id", order.id)
-        .eq("user_id", session.user.id);
-
-    if (updateError) {
-      throw new Error(updateError.message);
-    }
-
-    alert("Receipt uploaded successfully.");
-
-    await loadOrders(session.user.id);
-
-  } catch (error) {
-    console.error("Receipt upload error:", error);
-    alert(error.message);
-
-  } finally {
-    button.disabled = false;
-    button.textContent = "Upload Receipt";
-  }
-}
-
-
-// ---------- PURCHASE ----------
+/* =========================
+   PURCHASE PAGE
+========================= */
 
 let purchaseItems = [];
 
 async function loadPurchaseItems() {
-  const select = document.getElementById("purchase-item");
+  const itemSelect = getElement("purchase-item");
 
-  if (!select) return;
+  if (!itemSelect) return;
 
   const { data, error } = await supabaseClient
     .from("store_items")
-    .select("id, title, price, description")
+    .select("*")
     .eq("active", true)
-    .order("id");
+    .order("id", { ascending: true });
 
   if (error) {
-    console.error("Purchase items error:", error);
-
-    select.replaceChildren(
-      createText(
-        "option",
-        "Unable to load items."
-      )
+    console.error(error);
+    showMessage(
+      "purchase-message",
+      "Unable to load store items.",
+      "error"
     );
-
     return;
   }
 
   purchaseItems = data || [];
 
-  select.replaceChildren(
-    createText("option", "Select an item...")
-  );
+  itemSelect.innerHTML = "";
 
-  select.firstChild.value = "";
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "Select an item...";
+  itemSelect.appendChild(defaultOption);
 
-  purchaseItems.forEach(item => {
-    const option = createText(
-      "option",
-      `${item.title} — ${item.price} GC`
-    );
+  purchaseItems.forEach((item) => {
+    const option = document.createElement("option");
 
     option.value = item.id;
+    option.textContent =
+      `${item.title} - ${formatPrice(item.price)}`;
 
-    select.appendChild(option);
+    itemSelect.appendChild(option);
   });
 
-  select.addEventListener("change", updateSelectedItem);
+  const params = new URLSearchParams(
+    window.location.search
+  );
+
+  const selectedItem = params.get("item");
+
+  if (selectedItem) {
+    itemSelect.value = selectedItem;
+  }
+
+  updateSelectedItem();
 }
 
 function updateSelectedItem() {
-  const select = document.getElementById("purchase-item");
-  const box = document.getElementById("selected-item");
+  const itemSelect = getElement("purchase-item");
+  const selectedItemElement = getElement("selected-item");
 
-  if (!select || !box) return;
+  if (!itemSelect || !selectedItemElement) return;
 
   const item = purchaseItems.find(
-    item => String(item.id) === select.value
+    (storeItem) =>
+      String(storeItem.id) === String(itemSelect.value)
   );
 
   if (!item) {
-    box.className = "selected-item";
-    box.replaceChildren();
+    selectedItemElement.innerHTML =
+      "<p>Select an item to continue.</p>";
     return;
   }
 
-  box.className = "selected-item show";
-
-  const title = createText("h3", item.title);
-
-  const description = createText(
-    "p",
-    item.description || "Available in the GBC marketplace."
-  );
-
-  const price = createText(
-    "strong",
-    `${item.price} GC`
-  );
-
-  box.append(title, description, price);
+  selectedItemElement.innerHTML = `
+    <h3>${escapeHTML(item.title)}</h3>
+    <p>${escapeHTML(item.description || "")}</p>
+    <strong>${formatPrice(item.price)}</strong>
+  `;
 }
 
 async function loadBankDetails() {
-  const bankName = document.getElementById("bank-name");
+  const bankName = getElement("bank-name");
+  const bankAccount = getElement("bank-account");
+  const bankAccountName = getElement("bank-account-name");
 
-  if (!bankName) return;
+  if (!bankName && !bankAccount && !bankAccountName) {
+    return;
+  }
 
   const { data, error } = await supabaseClient
     .from("site_config")
     .select("*")
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (error) {
-    console.error("Bank details error:", error);
-
-    bankName.textContent = "Unable to load";
-    document.getElementById("bank-account")
-      .textContent = "Unable to load";
-    document.getElementById("bank-account-name")
-      .textContent = "Unable to load";
-
+    console.error(error);
     return;
   }
 
-  // These are the expected site_config field names.
-  bankName.textContent = data.bank_name || "Not configured";
+  if (bankName) {
+    bankName.textContent = data?.bank_name || "Not available";
+  }
 
-  document.getElementById("bank-account")
-    .textContent = data.account_number || "Not configured";
+  if (bankAccount) {
+    bankAccount.textContent =
+      data?.account_number || "Not available";
+  }
 
-  document.getElementById("bank-account-name")
-    .textContent = data.account_name || "Not configured";
+  if (bankAccountName) {
+    bankAccountName.textContent =
+      data?.account_name || "Not available";
+  }
 }
 
 async function handlePurchase(event) {
   event.preventDefault();
-
-  const message = document.getElementById("purchase-message");
-  const button = event.target.querySelector("button");
-  const select = document.getElementById("purchase-item");
-  const input = document.getElementById("purchase-receipt");
 
   const session = await getCurrentSession();
 
@@ -692,118 +522,628 @@ async function handlePurchase(event) {
     return;
   }
 
+  const itemSelect = getElement("purchase-item");
+  const receiptInput = getElement("purchase-receipt");
+
+  if (!itemSelect || !receiptInput) return;
+
   const item = purchaseItems.find(
-    item => String(item.id) === select.value
+    (storeItem) =>
+      String(storeItem.id) === String(itemSelect.value)
   );
 
-  const file = input.files[0];
-
   if (!item) {
-    showMessage(message, "Please select an item.", "error");
+    showMessage(
+      "purchase-message",
+      "Select an item first.",
+      "error"
+    );
     return;
   }
 
-  if (!file) {
-    showMessage(message, "Please upload a receipt.", "error");
+  const receiptFile = receiptInput.files[0];
+
+  if (!receiptFile) {
+    showMessage(
+      "purchase-message",
+      "Upload your payment receipt.",
+      "error"
+    );
     return;
   }
 
-  button.disabled = true;
-  button.textContent = "Submitting order...";
-  message.className = "form-message";
+  showMessage(
+    "purchase-message",
+    "Uploading receipt..."
+  );
 
-  try {
-    const orderId =
-      `GBC-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  const orderId = createOrderId();
 
-    const safeName = file.name.replace(
-      /[^a-zA-Z0-9._-]/g,
-      "_"
-    );
+  const safeFilename = receiptFile.name
+    .replace(/[^a-zA-Z0-9._-]/g, "_");
 
-    const receiptPath =
-      `${session.user.id}/${orderId}-${safeName}`;
+  const receiptPath =
+    `${session.user.id}/${orderId}-${safeFilename}`;
 
-    // Upload receipt first.
-    const { error: uploadError } =
-      await supabaseClient.storage
-        .from("receipts")
-        .upload(receiptPath, file, {
-          upsert: false
-        });
+  const { error: uploadError } =
+    await supabaseClient.storage
+      .from("receipts")
+      .upload(receiptPath, receiptFile);
 
-    if (uploadError) {
-      throw new Error(uploadError.message);
-    }
-
-    // Insert the order with the receipt path.
-    const { error: orderError } =
-      await supabaseClient
-        .from("orders")
-        .insert({
-          order_id: orderId,
-          user_id: session.user.id,
-          item_title: item.title,
-          item_price: item.price,
-          receipt_path: receiptPath,
-          status: "pending"
-        });
-
-    if (orderError) {
-      throw new Error(orderError.message);
-    }
+  if (uploadError) {
+    console.error(uploadError);
 
     showMessage(
-      message,
-      "Order submitted successfully. You can track it in your account.",
-      "success"
+      "purchase-message",
+      uploadError.message,
+      "error"
     );
+    return;
+  }
 
-    event.target.reset();
+  showMessage(
+    "purchase-message",
+    "Submitting order..."
+  );
 
-    setTimeout(() => {
-      window.location.href = "account.html";
-    }, 1200);
+  const { error: orderError } =
+    await supabaseClient
+      .from("orders")
+      .insert({
+        order_id: orderId,
+        user_id: session.user.id,
+        item_title: item.title,
+        item_price: item.price,
+        receipt_path: receiptPath,
+        status: "pending"
+      });
 
-  } catch (error) {
-    console.error("Purchase error:", error);
+  if (orderError) {
+    console.error(orderError);
 
     showMessage(
-      message,
+      "purchase-message",
+      orderError.message,
+      "error"
+    );
+    return;
+  }
+
+  window.location.href = "account.html";
+}
+
+
+/* =========================
+   STAFF LOGIN
+========================= */
+
+async function handleStaffLogin(event) {
+  event.preventDefault();
+
+  const loginInput = getElement("staff-login");
+  const passwordInput = getElement("staff-password");
+
+  if (!loginInput || !passwordInput) return;
+
+  const login = loginInput.value.trim();
+  const password = passwordInput.value;
+
+  showMessage(
+    "staff-login-message",
+    "Checking staff account..."
+  );
+
+  let email = login;
+
+  if (!login.includes("@")) {
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_login_email",
+        {
+          login_identifier: login
+        }
+      );
+
+    if (error || !data) {
+      showMessage(
+        "staff-login-message",
+        "Staff account not found.",
+        "error"
+      );
+      return;
+    }
+
+    email = data;
+  }
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+    showMessage(
+      "staff-login-message",
       error.message,
       "error"
     );
-
-  } finally {
-    button.disabled = false;
-    button.textContent = "Submit Order";
-  }
-}
-
-
-// ---------- LOGOUT ----------
-
-async function logoutPlayer() {
-  const { error } =
-    await supabaseClient.auth.signOut();
-
-  if (error) {
-    console.error("Logout error:", error);
     return;
   }
 
-  window.location.href = "index.html";
+  const userId = data.user.id;
+
+  const { data: staff, error: staffError } =
+    await supabaseClient
+      .from("staff")
+      .select("level, role, active")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+  if (
+    staffError ||
+    !staff ||
+    staff.active !== true
+  ) {
+    await supabaseClient.auth.signOut();
+
+    showMessage(
+      "staff-login-message",
+      "You are not authorized as GBC staff.",
+      "error"
+    );
+    return;
+  }
+
+  window.location.href = "panel.html";
 }
 
 
-// ---------- INITIALIZATION ----------
+/* =========================
+   STAFF PANEL
+========================= */
+
+async function loadStaffPanel() {
+  const panelName = getElement("staff-panel-name");
+
+  if (!panelName) return;
+
+  const session = await getCurrentSession();
+
+  if (!session) {
+    window.location.href = "staff-login.html";
+    return;
+  }
+
+  const userId = session.user.id;
+
+  const { data: profile } =
+    await supabaseClient
+      .from("profiles")
+      .select("username, email")
+      .eq("id", userId)
+      .maybeSingle();
+
+  const { data: staff, error } =
+    await supabaseClient
+      .from("staff")
+      .select("level, role, active")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+  if (
+    error ||
+    !staff ||
+    staff.active !== true
+  ) {
+    await supabaseClient.auth.signOut();
+    window.location.href = "staff-login.html";
+    return;
+  }
+
+  const level = Number(staff.level || 0);
+
+  panelName.textContent =
+    profile?.username ||
+    session.user.email ||
+    "Staff Member";
+
+  const roleElement = getElement("staff-panel-role");
+  const levelElement = getElement("staff-panel-level");
+
+  if (roleElement) {
+    roleElement.textContent =
+      staff.role || "GBC Staff";
+  }
+
+  if (levelElement) {
+    levelElement.textContent = level;
+  }
+
+  const ordersCard = getElement("orders-panel-card");
+  const storeCard = getElement("store-panel-card");
+  const bankCard = getElement("bank-panel-card");
+  const managementCard = getElement("staff-management-card");
+
+  if (level >= 2 && ordersCard) {
+    ordersCard.classList.remove("hidden");
+    await loadStaffOrders();
+  }
+
+  if (level >= 4 && storeCard) {
+    storeCard.classList.remove("hidden");
+    await loadStaffStoreItems();
+  }
+
+  if (level >= 7 && bankCard) {
+    bankCard.classList.remove("hidden");
+    await loadStaffBankDetails();
+  }
+
+  if (level >= 8 && managementCard) {
+    managementCard.classList.remove("hidden");
+  }
+}
+
+
+/* =========================
+   STAFF ORDERS
+========================= */
+
+async function loadStaffOrders() {
+  const ordersList = getElement("staff-orders-list");
+
+  if (!ordersList) return;
+
+  ordersList.innerHTML = "<p>Loading orders...</p>";
+
+  const { data, error } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .order("id", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    ordersList.innerHTML =
+      "<p>Unable to load orders.</p>";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    ordersList.innerHTML =
+      "<p>No orders found.</p>";
+    return;
+  }
+
+  ordersList.innerHTML = "";
+
+  data.forEach((order) => {
+    const card = document.createElement("article");
+
+    const status = String(
+      order.status || "pending"
+    ).toLowerCase();
+
+    card.className = "staff-order-card";
+
+    card.innerHTML = `
+      <h3>${escapeHTML(order.item_title)}</h3>
+
+      <p>
+        Order ID:
+        ${escapeHTML(order.order_id)}
+      </p>
+
+      <p>
+        User ID:
+        ${escapeHTML(order.user_id)}
+      </p>
+
+      <p>
+        Price:
+        ${formatPrice(order.item_price)}
+      </p>
+
+      <p>
+        Status:
+        <strong class="status-${escapeHTML(status)}">
+          ${escapeHTML(status.toUpperCase())}
+        </strong>
+      </p>
+
+      <div class="order-actions">
+        <button
+          class="primary-button"
+          data-order-action="approved"
+          data-order-id="${escapeHTML(order.id)}"
+        >
+          Approve
+        </button>
+
+        <button
+          class="danger-button"
+          data-order-action="rejected"
+          data-order-id="${escapeHTML(order.id)}"
+        >
+          Reject
+        </button>
+      </div>
+    `;
+
+    ordersList.appendChild(card);
+  });
+
+  document
+    .querySelectorAll("[data-order-action]")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const orderId = button.dataset.orderId;
+        const newStatus = button.dataset.orderAction;
+
+        await updateOrderStatus(orderId, newStatus);
+      });
+    });
+}
+
+async function updateOrderStatus(orderId, status) {
+  const { error } =
+    await supabaseClient
+      .from("orders")
+      .update({ status })
+      .eq("id", orderId);
+
+  if (error) {
+    showMessage(
+      "panel-message",
+      error.message,
+      "error"
+    );
+    return;
+  }
+
+  showMessage(
+    "panel-message",
+    `Order ${status}.`,
+    "success"
+  );
+
+  await loadStaffOrders();
+}
+
+
+/* =========================
+   STAFF STORE MANAGEMENT
+========================= */
+
+async function loadStaffStoreItems() {
+  const storeList = getElement("staff-store-list");
+
+  if (!storeList) return;
+
+  const { data, error } =
+    await supabaseClient
+      .from("store_items")
+      .select("*")
+      .order("id", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    storeList.innerHTML =
+      "<p>Unable to load store items.</p>";
+    return;
+  }
+
+  storeList.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    storeList.innerHTML =
+      "<p>No store items found.</p>";
+    return;
+  }
+
+  data.forEach((item) => {
+    const itemElement = document.createElement("article");
+
+    itemElement.className = "staff-store-item";
+
+    itemElement.innerHTML = `
+      <h3>${escapeHTML(item.title)}</h3>
+
+      <p>
+        ${escapeHTML(item.category || "")}
+      </p>
+
+      <p>
+        ${formatPrice(item.price)}
+      </p>
+
+      <p>
+        Status:
+        ${item.active ? "Active" : "Inactive"}
+      </p>
+    `;
+
+    storeList.appendChild(itemElement);
+  });
+}
+
+async function handleStoreItemCreation(event) {
+  event.preventDefault();
+
+  const category = getElement("store-category")?.value.trim();
+  const title = getElement("store-title")?.value.trim();
+  const price = Number(getElement("store-price")?.value);
+  const tag = getElement("store-tag")?.value.trim();
+  const description =
+    getElement("store-description")?.value.trim();
+
+  if (!category || !title || !price || !description) {
+    showMessage(
+      "panel-message",
+      "Complete all store item fields.",
+      "error"
+    );
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("store_items")
+      .insert({
+        category,
+        title,
+        price,
+        tag,
+        description,
+        active: true
+      });
+
+  if (error) {
+    showMessage(
+      "panel-message",
+      error.message,
+      "error"
+    );
+    return;
+  }
+
+  event.target.reset();
+
+  showMessage(
+    "panel-message",
+    "Store item added successfully.",
+    "success"
+  );
+
+  await loadStaffStoreItems();
+}
+
+
+/* =========================
+   STAFF BANK DETAILS
+========================= */
+
+async function loadStaffBankDetails() {
+  const { data, error } =
+    await supabaseClient
+      .from("site_config")
+      .select("*")
+      .limit(1)
+      .maybeSingle();
+
+  if (error || !data) return;
+
+  const bankName = getElement("bank-config-name");
+  const accountNumber = getElement("bank-config-number");
+  const accountName = getElement("bank-config-owner");
+
+  if (bankName) {
+    bankName.value = data.bank_name || "";
+  }
+
+  if (accountNumber) {
+    accountNumber.value = data.account_number || "";
+  }
+
+  if (accountName) {
+    accountName.value = data.account_name || "";
+  }
+}
+
+async function handleBankDetailsSave(event) {
+  event.preventDefault();
+
+  const bankName =
+    getElement("bank-config-name")?.value.trim();
+
+  const accountNumber =
+    getElement("bank-config-number")?.value.trim();
+
+  const accountName =
+    getElement("bank-config-owner")?.value.trim();
+
+  if (!bankName || !accountNumber || !accountName) {
+    showMessage(
+      "panel-message",
+      "Complete all bank details.",
+      "error"
+    );
+    return;
+  }
+
+  const { data: existingConfig } =
+    await supabaseClient
+      .from("site_config")
+      .select("id")
+      .limit(1)
+      .maybeSingle();
+
+  let result;
+
+  if (existingConfig?.id) {
+    result = await supabaseClient
+      .from("site_config")
+      .update({
+        bank_name: bankName,
+        account_number: accountNumber,
+        account_name: accountName
+      })
+      .eq("id", existingConfig.id);
+  } else {
+    result = await supabaseClient
+      .from("site_config")
+      .insert({
+        bank_name: bankName,
+        account_number: accountNumber,
+        account_name: accountName
+      });
+  }
+
+  if (result.error) {
+    showMessage(
+      "panel-message",
+      result.error.message,
+      "error"
+    );
+    return;
+  }
+
+  showMessage(
+    "panel-message",
+    "Bank details saved.",
+    "success"
+  );
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logoutPlayer() {
+  await supabaseClient.auth.signOut();
+  window.location.href = "login.html";
+}
+
+async function logoutStaff() {
+  await supabaseClient.auth.signOut();
+  window.location.href = "staff-login.html";
+}
+
+
+/* =========================
+   PAGE INITIALIZATION
+========================= */
 
 document.addEventListener("DOMContentLoaded", () => {
-
   loadStore();
+  loadAccountPage();
+  loadPurchaseItems();
+  loadBankDetails();
+  loadStaffPanel();
 
-  const loginForm =
-    document.getElementById("login-form");
+  const loginForm = getElement("login-form");
 
   if (loginForm) {
     loginForm.addEventListener(
@@ -812,8 +1152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  const registerForm =
-    document.getElementById("register-form");
+  const registerForm = getElement("register-form");
 
   if (registerForm) {
     registerForm.addEventListener(
@@ -822,42 +1161,99 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  const logoutLink =
-    document.getElementById("logout-link");
+  const staffLoginForm =
+    getElement("staff-login-form");
 
-  if (logoutLink) {
-    logoutLink.addEventListener("click", event => {
-      event.preventDefault();
-      logoutPlayer();
-    });
-  }
-
-  const refreshButton =
-    document.getElementById("refresh-orders");
-
-  if (refreshButton) {
-    refreshButton.addEventListener("click", async () => {
-      const session = await getCurrentSession();
-
-      if (session) {
-        await loadOrders(session.user.id);
-      }
-    });
+  if (staffLoginForm) {
+    staffLoginForm.addEventListener(
+      "submit",
+      handleStaffLogin
+    );
   }
 
   const purchaseForm =
-    document.getElementById("purchase-form");
+    getElement("purchase-form");
 
   if (purchaseForm) {
-    loadPurchaseItems();
-    loadBankDetails();
-
     purchaseForm.addEventListener(
       "submit",
       handlePurchase
     );
   }
 
-  loadAccount();
+  const purchaseItem =
+    getElement("purchase-item");
 
+  if (purchaseItem) {
+    purchaseItem.addEventListener(
+      "change",
+      updateSelectedItem
+    );
+  }
+
+  const storeItemForm =
+    getElement("store-item-form");
+
+  if (storeItemForm) {
+    storeItemForm.addEventListener(
+      "submit",
+      handleStoreItemCreation
+    );
+  }
+
+  const bankDetailsForm =
+    getElement("bank-details-form");
+
+  if (bankDetailsForm) {
+    bankDetailsForm.addEventListener(
+      "submit",
+      handleBankDetailsSave
+    );
+  }
+
+  const logoutLink =
+    getElement("logout-link");
+
+  if (logoutLink) {
+    logoutLink.addEventListener(
+      "click",
+      logoutPlayer
+    );
+  }
+
+  const staffLogoutButton =
+    getElement("staff-logout-button");
+
+  if (staffLogoutButton) {
+    staffLogoutButton.addEventListener(
+      "click",
+      logoutStaff
+    );
+  }
+
+  const refreshOrders =
+    getElement("refresh-orders");
+
+  if (refreshOrders) {
+    refreshOrders.addEventListener(
+      "click",
+      async () => {
+        const session = await getCurrentSession();
+
+        if (session) {
+          await loadPlayerOrders(session.user.id);
+        }
+      }
+    );
+  }
+
+  const refreshStaffOrders =
+    getElement("refresh-orders-panel");
+
+  if (refreshStaffOrders) {
+    refreshStaffOrders.addEventListener(
+      "click",
+      loadStaffOrders
+    );
+  }
 });
