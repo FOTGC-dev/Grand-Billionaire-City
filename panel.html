@@ -15,43 +15,79 @@
         </div>
         <div class="nav-actions">
             <a href="index.html" class="btn-nav btn-nav-outline">HOME</a>
-            <a href="marketplace.html" class="btn-nav">MARKET</a>
+            <a href="marketplace.html" class="btn-nav btn-nav-outline">STORE</a>
+            <button id="logoutBtn" class="btn-nav btn-danger" style="display: none;" onclick="staffLogout()">LOGOUT</button>
         </div>
     </nav>
 
     <div class="page-view">
-        <div class="section-title" style="text-align: center;">UPLOAD NEW ITEM TO MARKETPLACE</div>
-        <div class="admin-form-container">
-            <form id="uploadForm" onsubmit="handleItemUpload(event)">
+        <!-- LOGIN SCREEN (Visible by default if not authenticated) -->
+        <div id="loginScreen" class="admin-form-container" style="margin-top: 60px;">
+            <div class="section-title" style="text-align: center; justify-content: center; margin-bottom: 10px;">STAFF LOGIN</div>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Enter administrative credentials to access item management panel.</p>
+            <form onsubmit="handleStaffLogin(event)">
                 <div class="form-group">
-                    <label for="itemTitle">Item Name</label>
-                    <input type="text" id="itemTitle" placeholder="e.g. Lamborghini Revuelto" required>
+                    <label>Staff Username</label>
+                    <input type="text" id="staffUser" placeholder="admin" required>
                 </div>
                 <div class="form-group">
-                    <label for="itemPrice">Price (in GC Coin)</label>
-                    <input type="number" id="itemPrice" placeholder="e.g. 54" required>
+                    <label>Password</label>
+                    <input type="password" id="staffPass" placeholder="••••••••" required>
                 </div>
-                <div class="form-group">
-                    <label for="itemTag">Stock / Badge Tag</label>
-                    <input type="text" id="itemTag" placeholder="e.g. STOCK 5 • 10% OFF" required>
-                </div>
-                <div class="form-group">
-                    <label for="itemImage">Image URL</label>
-                    <input type="url" id="itemImage" placeholder="https://images.unsplash.com/..." required>
-                </div>
-                <div class="form-group">
-                    <label for="itemDesc">Description / Value Specs</label>
-                    <textarea id="itemDesc" rows="3" placeholder="Game Value: 120M • GTA ID 560" required></textarea>
-                </div>
-                <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 14px;">UPLOAD ITEM TO MARKETPLACE</button>
+                <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 14px;">AUTHENTICATE</button>
             </form>
+        </div>
+
+        <!-- UPLOAD PANEL SCREEN (Hidden until logged in) -->
+        <div id="panelScreen" style="display: none;">
+            <div class="section-title" style="text-align: center; justify-content: center;">UPLOAD NEW ITEM TO CATEGORY</div>
+            <div class="admin-form-container">
+                <form id="uploadForm" onsubmit="handleItemUpload(event)">
+                    <div class="form-group">
+                        <label for="itemCategory">Select Target Category</label>
+                        <select id="itemCategory" required>
+                            <option value="coins">Buy GC Coin</option>
+                            <option value="donators">Donator Tiers</option>
+                            <option value="properties">Property Listings</option>
+                            <option value="business">Business Properties</option>
+                            <option value="vehicles" selected>Vehicle Collection</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemTitle">Item Name</label>
+                        <input type="text" id="itemTitle" placeholder="e.g. Porsche 911 Turbo S" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemPrice">Price / Cost Display</label>
+                        <input type="text" id="itemPrice" placeholder="e.g. 34 GC" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemTag">Badge / Stock Tag</label>
+                        <input type="text" id="itemTag" placeholder="e.g. STOCK 5 • 10% OFF" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemImage">Image URL (Optional for Coins/Tiers)</label>
+                        <input type="url" id="itemImage" placeholder="https://images.unsplash.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label for="itemDesc">Description / Perks / Real-world equivalent</label>
+                        <textarea id="itemDesc" rows="3" placeholder="Game Value: 75M • $1.35 • ₦2,000" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 14px;">PUBLISH TO MARKETPLACE</button>
+                </form>
+            </div>
         </div>
     </div>
 
     <footer>
-        <p>© 2026 GRAND BILLIONAIRE CITY STUDIO | Nigeria Hub | All Rights Reserved</p>
+        <p>© 2022-2026 GRAND BILLIONAIRE CITY • GC COIN OFFICIAL</p>
     </footer>
 
     <script src="script.js"></script>
+    <script>
+        window.onload = () => {
+            checkStaffAuth();
+        };
+    </script>
 </body>
 </html>
