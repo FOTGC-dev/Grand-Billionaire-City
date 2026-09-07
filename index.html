@@ -1,67 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="pageTitleMeta">GBC - Ultimate Roleplay Experience</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grand Billionaire City</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="announcement-bar">
-        <span class="badge" id="navBadge">GBC</span> 
-        <span id="lifeSupportSpeechText">⚠️ LIFE SUPPORT NOTICE: Keep your bank transfer receipts safe until admin verification is complete. Welcome to Grand Billionaire City!</span>
-    </div>
+  <header class="navbar">
+    <a href="index.html" class="logo">
+      <span>GBC</span>
+      <small>GRAND BILLIONAIRE CITY</small>
+    </a>
 
-    <header class="navbar">
-        <div class="logo">GRAND BILLIONAIRE CITY</div>
-        <nav class="nav-links">
-            <a href="index.html" class="active">Home</a>
-            <a href="#store">Store</a>
-            <a href="login.html" id="authNavBtn">Player Login</a>
-            <a href="staff-login.html" class="staff-link">Staff Portal</a>
-        </nav>
-    </header>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#store">Store</a>
+      <a href="login.html">Player Login</a>
+    </nav>
+  </header>
 
+  <main>
     <section class="hero">
-        <div class="hero-content">
-            <span class="hero-badge" id="heroBadge">WELCOME TO GBC</span>
-            <h1 id="heroTitle">The Ultimate Roleplay Experience</h1>
-            <p id="heroDescription">Build your legacy, acquire high-tier vehicles, claim luxury properties, and network with elite players across Grand Billionaire City.</p>
-            <div class="hero-btns">
-                <a href="#store" class="btn-primary">Explore Store</a>
-                <a href="https://discord.gg/grnd" target="_blank" class="btn-secondary">Join Discord</a>
-            </div>
+      <div class="hero-content">
+        <span class="eyebrow">WELCOME TO GBC</span>
+        <h1>Build your empire.<br><span>Rule your city.</span></h1>
+        <p>
+          Enter Grand Billionaire City — a world of luxury,
+          ambition, and unlimited possibilities.
+        </p>
+
+        <div class="hero-actions">
+          <a href="register.html" class="btn btn-primary">Create Account</a>
+          <a href="#store" class="btn btn-secondary">Explore Store</a>
         </div>
+      </div>
     </section>
 
-    <section id="store" class="store-section">
-        <div class="section-title">
-            <h2>Live Marketplace</h2>
-            <p>Select items and use our secure admin-backed direct bank transfer system.</p>
+    <section class="section" id="store">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">MARKETPLACE</span>
+          <h2>Build your empire</h2>
+          <p>Purchase coins, vehicles, and properties.</p>
         </div>
-        <div class="marketplace-grid" id="liveMarketplaceGrid"></div>
+        <a href="login.html" class="text-link">View all →</a>
+      </div>
+
+      <div id="store-grid" class="store-grid">
+        <div class="loading">Loading store...</div>
+      </div>
     </section>
+  </main>
 
-    <footer>
-        <p>&copy; 2026 Grand Billionaire City. All rights reserved.</p>
-    </footer>
+  <footer>
+    <div class="logo">
+      <span>GBC</span>
+      <small>GRAND BILLIONAIRE CITY</small>
+    </div>
+    <p>© 2026 Grand Billionaire City. All rights reserved.</p>
+  </footer>
 
-    <script src="script.js"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            renderDynamicHomepage();
-            renderMarketplaceStorefront();
-            const loggedUser = sessionStorage.getItem('gbc_logged_in_user');
-            if(loggedUser) {
-                const btn = document.getElementById('authNavBtn');
-                btn.innerText = `Logout (${loggedUser})`;
-                btn.href = '#';
-                btn.onclick = userLogout;
-            }
-        });
-    </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
 </body>
 </html>
