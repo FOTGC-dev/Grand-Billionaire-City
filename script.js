@@ -59,7 +59,7 @@ function renderMarketplace() {
                     <div class="card-title">${item.title}</div>
                     <div class="card-desc">${item.desc}</div>
                     <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 12px;">${item.price}</div>
-                    <button class="btn-primary btn-whatsapp" onclick="orderItemWhatsApp('${item.title}', '${item.price}')">BUY VIA WHATSAPP</button>
+                    <button class="btn-primary" onclick="addToCart('${item.title}', '${item.price}')">ADD TO CART</button>
                 </div>
             `;
             grid.appendChild(card);
@@ -67,28 +67,150 @@ function renderMarketplace() {
     }
 }
 
-function orderItemWhatsApp(title, price) {
+// Shopping Cart Management
+function getCart() {
+    const saved = localStorage.getItem('gbc_cart_items');
+    return saved ? JSON.parse(saved) : [];
+}
+
+function addToCart(title, price) {
+    const cart = getCart();
+    cart.push({ title, price });
+    localStorage.setItem('gbc_cart_items', JSON.stringify(cart));
+    updateCartUI();
+    toggleCartDrawer();
+}
+
+function removeFromCart(index) {
+    const cart = getCart();
+    cart.splice(index, 1);
+    localStorage.setItem('gbc_cart_items', JSON.stringify(cart));
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const cart = getCart();
+    const countEl = document.getElementById('cartCount');
+    if(countEl) countEl.innerText = cart.length;
+
+    const listEl = document.getElementById('cartItemsList');
+    if(!listEl) return;
+
+    if (cart.length === 0) {
+        listEl.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 20px;">Your cart is empty.</p>';
+        return;
+    }
+
+    listEl.innerHTML = '';
+    cart.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'cart-item-row';
+        row.innerHTML = `
+            <div>
+                <strong>${item.title}</strong><br>
+                <span style="color: var(--accent-gold);">${item.price}</span>
+            </div>
+            <button class="btn-primary btn-danger" style="width: auto; padding: 4px 8px; font-size: 0.75rem;" onclick="removeFromCart(${index})">✕</button>
+        `;
+        listEl.appendChild(row);
+    });
+}
+
+function toggleCartDrawer() {
+    const drawer = document.getElementById('cartDrawer');
+    if(drawer) drawer.classList.toggle('open');
+}
+
+function checkoutCartWhatsApp() {
+    const cart = getCart();
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+    }
+
     const orderId = 'GBC-' + Math.floor(100000 + Math.random() * 900000);
-    const message = `Hello Grand Billionaire City Support, I would like to purchase:\n\n📦 Item: ${title}\n💎 Price: ${price}\n🆔 Order ID: ${orderId}\n\nPlease verify and send payment/in-game delivery instructions.`;
+    let itemsText = cart.map(i => `• ${i.title} (${i.price})`).join('\n');
+    
+    const message = `Hello Grand Billionaire City Support, I would like to check out the following items:\n\n${itemsText}\n\n🆔 Order ID: ${orderId}\n\nPlease provide payment details.`;
     const encoded = encodeURIComponent(message);
-    const whatsappNumber = "2348000000000"; 
-    window.open(`https://wa.me/${whatsappNumber}?text=${encoded}`, '_blank');
+    window.open(`https://wa.me/2348000000000?text=${encoded}`, '_blank');
 }
 
-function checkoutViaWhatsApp() {
-    orderItemWhatsApp("General Cart Checkout", "Custom Order");
+// Live Chat Support Widget Logic
+function toggleSupportChat() {
+    const box = document.getElementById('supportChatBox');
+    if(box) {
+        box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+    }
 }
 
-function sendContactEmail(e) {
-    e.preventDefault();
-    const name = document.getElementById('contactName').value;
-    const email = document.getElementById('contactEmail').value;
-    const msg = document.getElementById('contactMsg').value;
-    alert(`Thank you ${name}! Your message has been sent to grandbillionairecity@gmail.com.`);
-    e.target.reset();
+function getChatMessages() {
+    const saved = localStorage.getItem('gbc_live_chat_history');
+    return saved ? JSON.parse(saved) : [{ sender: 'admin', text: 'Hello! How can we assist you with your Grand Billionaire City order today?' }];
 }
 
-// Auth Tabs & Registration Management
+function sendUserChatMessage() {
+    const input = document.getElementById('chatInputMsg');
+    if(!input || !input.value.trim()) return;
+
+    const chat = getChatMessages();
+    chat.push({ sender: 'user', text: input.value.trim() });
+    localStorage.setItem('gbc_live_chat_history', JSON.stringify(chat));
+    input.value = '';
+    renderChatBox();
+}
+
+function handleChatEnter(e) {
+    if(e.key === 'Enter') sendUserChatMessage();
+}
+
+function renderChatBox() {
+    const body = document.getElementById('supportChatBody');
+    if(!body) return;
+
+    const chat = getChatMessages();
+    body.innerHTML = '';
+    chat.forEach(msg => {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${msg.sender}`;
+        bubble.innerText = msg.text;
+        body.appendChild(bubble);
+    });
+    body.scrollTop = body.scrollHeight;
+}
+
+// Admin Support Panel Logic
+function loadAdminChatSession() {
+    const log = document.getElementById('adminChatLog');
+    if(!log) return;
+
+    const chat = getChatMessages();
+    log.innerHTML = '';
+    chat.forEach(msg => {
+        const row = document.createElement('div');
+        row.style.textAlign = msg.sender === 'user' ? 'left' : 'right';
+        row.innerHTML = `<span style="display: inline-block; background: ${msg.sender === 'user' ? '#222' : '#f3ce54'}; color: ${msg.sender === 'user' ? '#fff' : '#000'}; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem;"><strong>${msg.sender.toUpperCase()}:</strong> ${msg.text}</span>`;
+        log.appendChild(row);
+    });
+    log.scrollTop = log.scrollHeight;
+}
+
+function sendAdminReply() {
+    const input = document.getElementById('adminReplyInput');
+    if(!input || !input.value.trim()) return;
+
+    const chat = getChatMessages();
+    chat.push({ sender: 'admin', text: input.value.trim() });
+    localStorage.setItem('gbc_live_chat_history', JSON.stringify(chat));
+    input.value = '';
+    loadAdminChatSession();
+}
+
+function handleAdminEnter(e) {
+    if(e.key === 'Enter') sendAdminReply();
+}
+
+// Authentication & Panel Code
 function switchAuthTab(tab) {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -116,15 +238,14 @@ function handleUserRegister(e) {
 
     const users = JSON.parse(localStorage.getItem('gbc_registered_users') || '[]');
     if (users.some(u => u.username === username)) {
-        alert('Username already exists! Choose another.');
+        alert('Username already exists!');
         return;
     }
 
     users.push({ username, email, pass });
     localStorage.setItem('gbc_registered_users', JSON.stringify(users));
-    
     sessionStorage.setItem('gbc_logged_in_user', username);
-    alert('Account created and logged in successfully!');
+    alert('Account created successfully!');
     checkUserAuth();
 }
 
@@ -133,7 +254,6 @@ function handleUserLogin(e) {
     const identifier = document.getElementById('loginUser').value;
     const pass = document.getElementById('loginPass').value;
 
-    // Allow default admin credentials or registered users
     if (identifier === 'admin' && pass === 'gbc2026admin') {
         sessionStorage.setItem('gbc_logged_in_user', 'Administrator');
         checkUserAuth();
@@ -147,7 +267,7 @@ function handleUserLogin(e) {
         sessionStorage.setItem('gbc_logged_in_user', found.username);
         checkUserAuth();
     } else {
-        alert('Invalid username/email or password!');
+        alert('Invalid credentials!');
     }
 }
 
@@ -175,7 +295,6 @@ function checkUserAuth() {
     }
 }
 
-// Toggle between URL input or Device File upload in panel
 function switchImgInput(mode) {
     const urlBox = document.getElementById('urlInputBox');
     const fileBox = document.getElementById('fileInputBox');
@@ -195,10 +314,8 @@ function switchImgInput(mode) {
     }
 }
 
-// Handle Upload with support for local file reading or URL
 function handleItemUpload(event) {
     event.preventDefault();
-    
     const category = document.getElementById('itemCategory').value;
     const title = document.getElementById('itemTitle').value;
     const price = document.getElementById('itemPrice').value;
@@ -222,10 +339,9 @@ function handleItemUpload(event) {
 function saveNewItem(category, newItem) {
     const data = getStoreData();
     if (!data[category]) data[category] = [];
-    
     data[category].unshift(newItem);
     localStorage.setItem('gbc_store_data_categorized', JSON.stringify(data));
-
     alert('Item successfully published to marketplace category!');
     document.getElementById('uploadForm').reset();
-}
+                                                }
+        
