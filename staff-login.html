@@ -1,29 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>GBC - Staff Portal</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GBC Staff Login</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js" defer></script>
 </head>
-<body class="auth-body">
-    <div class="auth-card">
-        <h2>Staff & Owner Portal</h2>
-        <form onsubmit="handleStaffLogin(event)" style="margin-bottom:20px;">
-            <label>Staff Username</label><input type="text" id="staffUser" required>
-            <label>Staff Password</label><input type="password" id="staffPass" required>
-            <button type="submit" class="btn-primary" style="margin-top:15px;">STAFF LOGIN</button>
-        </form>
-        <hr style="border:0; border-top:1px solid var(--card-border); margin:20px 0;">
-        <h4 style="color:white; margin-bottom:10px; font-size:0.9rem;">Want to join the staff team?</h4>
-        <form id="staffApplyForm" onsubmit="handleStaffApplication(event)">
-            <label>Your Name</label><input type="text" id="appUser" required>
-            <label>Email</label><input type="email" id="appEmail" required>
-            <label>Password</label><input type="password" id="appPass" required>
-            <label>Why do you want to join?</label><textarea id="appReason" rows="2" required></textarea>
-            <button type="submit" class="btn-primary" style="margin-top:10px; background:#222; border:1px solid var(--card-border);">SUBMIT APPLICATION</button>
-        </form>
-    </div>
-    <script src="script.js"></script>
+
+<body class="auth-page">
+
+  <header class="site-header">
+    <a href="index.html" class="logo">GRAND BILLIONAIRE CITY</a>
+  </header>
+
+  <main class="auth-container">
+    <section class="auth-card">
+      <p class="eyebrow">STAFF ACCESS</p>
+
+      <h1>Staff Login</h1>
+
+      <p class="auth-subtitle">
+        Authorized GBC staff only.
+      </p>
+
+      <form id="staff-login-form">
+
+        <label for="staff-login">Username or Email</label>
+        <input
+          type="text"
+          id="staff-login"
+          placeholder="Enter username or email"
+          required
+        />
+
+        <label for="staff-password">Password</label>
+        <input
+          type="password"
+          id="staff-password"
+          placeholder="Enter password"
+          required
+        />
+
+        <button type="submit" class="primary-button">
+          Enter Staff Panel
+        </button>
+
+        <p id="staff-login-message" class="form-message"></p>
+
+      </form>
+
+      <p class="auth-footer">
+        <a href="index.html">Return to website</a>
+      </p>
+    </section>
+  </main>
+
 </body>
 </html>
