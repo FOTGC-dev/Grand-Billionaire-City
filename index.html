@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Billionaire City - Home</title>
+    <title>Grand Billionaire City - Official Hub</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -14,57 +15,94 @@
             <span class="brand-title">GRAND BILLIONAIRE CITY</span>
         </div>
         <div class="nav-actions">
-            <a href="marketplace.html" class="btn-nav btn-cart">STORE</a>
+            <a href="marketplace.html" class="btn-nav">MARKETPLACE STORE</a>
+            <a href="https://wa.me/2348000000000" target="_blank" class="btn-whatsapp-icon" title="Direct WhatsApp Support"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
     </nav>
 
-    <div class="page-view">
+    <div class="page-view" style="max-width: 900px; margin-top: 30px;">
         <div class="hero">
-            <span class="badge-tag">OFFICIAL STUDIO • EST. 2022 NIGERIA HUB</span>
+            <span class="badge-tag">WELCOME TO THE CITY</span>
             <h1>GRAND BILLIONAIRE CITY</h1>
-            <p>A New Era of Roleplay - Official Mobile & PC. Realistic CRMP, open world, gangs, government, luxury life.</p>
-            <a href="marketplace.html" class="btn-nav" style="display: inline-block; width: auto; padding: 12px 24px;">EXPLORE STORE →</a>
-            
-            <div class="hero-stats">
-                <div class="stat-card">
-                    <h3>15K+</h3>
-                    <p>PLAYERS ACTIVE</p>
-                </div>
-                <div class="stat-card">
-                    <h3>CRMP+</h3>
-                    <p>REALISTIC RP</p>
-                </div>
-                <div class="stat-card">
-                    <h3>EST 2022</h3>
-                    <p>GLOBAL HUB</p>
-                </div>
-            </div>
+            <p>The ultimate roleplay and economic empire. Log in to access your player profile, or jump straight into the GC Coin marketplace.</p>
         </div>
 
-        <div class="section-title">VERIFIED OFFICIAL LINKS</div>
-        <div class="grid-cards">
-            <div class="card">
-                <div class="card-body">
-                    <span class="badge-tag">DISCORD</span>
-                    <div class="card-title">Official Discord</div>
-                    <div class="card-desc">15K+ members • Live announcements, support</div>
-                    <a href="https://discord.gg/grnd" target="_blank" class="btn-primary">Join Discord</a>
+        <!-- USER AUTHENTICATION CONTAINER -->
+        <div class="admin-form-container" id="homeAuthContainer" style="max-width: 500px; margin: 0 auto;">
+            <div id="loggedInView" style="display: none; text-align: center;">
+                <h3 style="margin-bottom: 10px; color: var(--accent-gold);">Welcome back, <span id="displayUsername">Player</span>!</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Your account is active. You can proceed directly to the marketplace or manage your session.</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <a href="marketplace.html" class="btn-primary" style="display: inline-block; width: auto; padding: 10px 20px;">OPEN STORE</a>
+                    <button class="btn-primary btn-danger" style="width: auto; padding: 10px 20px;" onclick="userLogout()">LOGOUT</button>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
-                    <span class="badge-tag">WHATSAPP GROUP</span>
-                    <div class="card-title">Support Group</div>
-                    <div class="card-desc">Instant verification & community chat</div>
-                    <a href="#" class="btn-primary btn-whatsapp">Open WhatsApp</a>
+
+            <div id="loggedOutView">
+                <h3 style="margin-bottom: 20px; text-align: center;">Player Access Portal</h3>
+                <div class="tab-selector">
+                    <button class="tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">Login</button>
+                    <button class="tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">Register</button>
                 </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" onsubmit="handleUserLogin(event)">
+                    <div class="form-group">
+                        <label>Username or Email</label>
+                        <input type="text" id="loginUser" required placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPass" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-primary">LOGIN TO ACCOUNT</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" style="display: none;" onsubmit="handleUserRegister(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="regUser" required placeholder="Choose a username">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="regEmail" required placeholder="name@domain.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPass" required placeholder="Create a password">
+                    </div>
+                    <button type="submit" class="btn-primary">REGISTER ACCOUNT</button>
+                </form>
             </div>
         </div>
     </div>
 
+    <!-- LIVE SUPPORT POPUP WIDGET -->
+    <button class="support-widget-btn" onclick="toggleSupportChat()"><i class="fa-solid fa-headset"></i></button>
+    <div class="support-chat-box" id="supportChatBox">
+        <div class="support-chat-header">
+            <span>Live Support Assistant</span>
+            <button class="btn-nav btn-nav-outline" style="padding: 2px 6px; font-size: 0.75rem;" onclick="toggleSupportChat()">✕</button>
+        </div>
+        <div class="support-chat-body" id="supportChatBody">
+            <div class="chat-bubble admin">Hello! How can we assist you with your Grand Billionaire City experience today?</div>
+        </div>
+        <div class="support-chat-footer">
+            <input type="text" id="chatInputMsg" placeholder="Type message..." onkeypress="handleChatEnter(event)">
+            <button class="btn-primary" style="width: auto; padding: 8px 12px;" onclick="sendUserChatMessage()">Send</button>
+        </div>
+    </div>
+
     <footer>
-        <p>© 2022-2026 GRAND BILLIONAIRE CITY • GC COIN OFFICIAL • GLOBAL STORE • WORLDWIDE • NO REGION LOCK</p>
+        <p>© 2025-2026 GRAND BILLIONAIRE CITY • OFFICIAL PORTAL</p>
     </footer>
 
+    <script src="script.js"></script>
+    <script>
+        window.onload = () => {
+            checkIndexAuth();
+        };
+    </script>
 </body>
 </html>
