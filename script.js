@@ -20,6 +20,9 @@ const defaultStoreData = {
     ],
     vehicles: [
         { id: 'v1', title: "Porsche 911 Turbo S", price: "34 GC", tag: "STOCK 5", desc: "Game Value: 75M" }
+    ],
+    properties: [
+        { id: 'p1', title: "Vinwood Mansion", price: "17 GC", tag: "ESTATE", desc: "Hillside luxury property" }
     ]
 };
 
@@ -78,7 +81,35 @@ function checkIndexAuth() {
     }
 }
 
-// Secret Staff Portal Authentication (from staff-login.php)
+// Render Marketplace Storefront
+function renderMarketplaceStorefront() {
+    const grid = document.getElementById('liveMarketplaceGrid');
+    if(!grid) return;
+    const data = getStoreData();
+    grid.innerHTML = '';
+
+    for (const category in data) {
+        data[category].forEach(item => {
+            const card = document.createElement('div');
+            card.style.background = '#111';
+            card.style.border = '1px solid var(--card-border)';
+            card.style.borderRadius = '8px';
+            card.style.padding = '15px';
+            card.innerHTML = `
+                <span style="background: var(--accent-gold); color: black; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${item.tag || category.toUpperCase()}</span>
+                <h4 style="color: white; margin: 10px 0 5px 0;">${item.title}</h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 10px;">${item.desc}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <span style="color: var(--accent-gold); font-weight: bold;">${item.price}</span>
+                    <button class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 0.8rem;" onclick="alert('Proceeding to checkout for ${item.title}')">BUY NOW</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+}
+
+// Secret Staff Portal Authentication
 function handleStaffLogin(e) {
     e.preventDefault();
     const identifier = document.getElementById('staffUser').value;
@@ -119,13 +150,13 @@ function handleStaffApplication(e) {
 // Panel Initialization & Level Permissions
 function initializeStaffPanel(username) {
     const staffList = JSON.parse(localStorage.getItem('gbc_approved_staff') || '[]');
-    const currentStaff = staffList.find(s => s.name === username) || { level: '1', role: 'Level 1: Trainee' };
+    const currentStaff = staffList.find(s => s.name === username) || { level: '1', role: 'Level 1: Support' };
     const userLevel = parseInt(currentStaff.level || '1');
 
     document.getElementById('welcomeUserBanner').innerText = `${username} (${currentStaff.role || 'Level 1 Support'})`;
 
     // Progressive Tab Exposure
-    if (userLevel >= 3) document.getElementById('tabOrdersBtn').style.display = 'block';
+    if (userLevel >= 2) document.getElementById('tabOrdersBtn').style.display = 'block';
     if (userLevel >= 4) document.getElementById('tabHomepageBtn').style.display = 'block';
     if (userLevel >= 5) document.getElementById('tabPlayersBtn').style.display = 'block';
     if (userLevel >= 6) document.getElementById('tabAdminsBtn').style.display = 'block';
@@ -315,5 +346,5 @@ function saveBankAccountInfo() {
 function loadBankSettings() {
     const input = document.getElementById('bankInfoInput');
     if(input) input.value = localStorage.getItem('gbc_bank_account_info') || '';
-}
-    
+            }
+        
