@@ -391,3 +391,40 @@ function saveNewItem(category, newItem) {
     document.getElementById('uploadForm').reset();
                  }
             
+// Homepage Authentication State Check
+function checkIndexAuth() {
+    const loggedUser = sessionStorage.getItem('gbc_logged_in_user');
+    const loggedInView = document.getElementById('loggedInView');
+    const loggedOutView = document.getElementById('loggedOutView');
+    const displayUsername = document.getElementById('displayUsername');
+
+    if (!loggedInView || !loggedOutView) return;
+
+    if (loggedUser) {
+        loggedInView.style.display = 'block';
+        loggedOutView.style.display = 'none';
+        if (displayUsername) displayUsername.innerText = loggedUser;
+    } else {
+        loggedInView.style.display = 'none';
+        loggedOutView.style.display = 'block';
+    }
+}
+
+// Override or extend login handlers to support homepage redirection state updates
+const originalHandleUserLogin = handleUserLogin;
+handleUserLogin = function(e) {
+    originalHandleUserLogin(e);
+    if(typeof checkIndexAuth === 'function') checkIndexAuth();
+};
+
+const originalHandleUserRegister = handleUserRegister;
+handleUserRegister = function(e) {
+    originalHandleUserRegister(e);
+    if(typeof checkIndexAuth === 'function') checkIndexAuth();
+};
+
+const originalUserLogout = userLogout;
+userLogout = function() {
+    originalUserLogout();
+    if(typeof checkIndexAuth === 'function') checkIndexAuth();
+};
