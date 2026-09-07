@@ -3,65 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GBC - Secure Staff Console</title>
+    <title>GBC - Staff & Admin Panel</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
-    <nav>
-        <div class="nav-brand"><span class="brand-badge">STAFF</span><span class="brand-title" id="welcomeUserBanner">Loading Console...</span></div>
-        <div class="nav-actions"><button class="btn-nav btn-danger" onclick="sessionStorage.removeItem('gbc_logged_in_user'); window.location.href='staff-login.html';">LOGOUT</button></div>
-    </nav>
-
-    <div class="page-view" style="max-width: 900px; margin-top: 30px;">
-        <div class="tab-selector" style="margin-bottom: 25px; flex-wrap: wrap;">
-            <button class="tab-btn active" onclick="switchPanelTab('support', this)"><i class="fa-solid fa-headset"></i> Support</button>
-            <button class="tab-btn" id="tabOrdersBtn" style="display:none;" onclick="switchPanelTab('orders', this)"><i class="fa-solid fa-receipt"></i> Orders</button>
-            <button class="tab-btn" id="tabHomepageBtn" style="display:none;" onclick="switchPanelTab('homepage', this)"><i class="fa-solid fa-house-laptop"></i> Homepage</button>
-            <button class="tab-btn" id="tabPlayersBtn" style="display:none;" onclick="switchPanelTab('players', this)"><i class="fa-solid fa-users"></i> Players</button>
-            <button class="tab-btn" id="tabAdminsBtn" style="display:none;" onclick="switchPanelTab('admins', this)"><i class="fa-solid fa-shield-halved"></i> Admins</button>
-            <button class="tab-btn" id="tabBankBtn" style="display:none;" onclick="switchPanelTab('bank', this)"><i class="fa-solid fa-university"></i> Bank</button>
-            <button class="tab-btn" id="tabStaffApprovalBtn" style="display:none;" onclick="switchPanelTab('staff', this)"><i class="fa-solid fa-user-gear"></i> Owner Staff</button>
-        </div>
-
-        <div class="panel-section" id="panelTab-support"><div class="admin-form-container" style="max-width: 100%;"><h3>Support Desk</h3><p style="color:var(--text-muted);">Active live support queues.</p></div></div>
-        <div class="panel-section" id="panelTab-orders" style="display: none;"><div class="admin-form-container" style="max-width: 100%;"><h3>Order Logs</h3></div></div>
-        
-        <!-- HOMEPAGE & DELETION TAB (Level 4+) -->
-        <div class="panel-section" id="panelTab-homepage" style="display: none;">
-            <div class="admin-form-container" style="max-width: 100%; margin-bottom: 20px;">
-                <h3>Add New Homepage Item</h3>
-                <form id="addItemForm" onsubmit="handleAddHomepageItem(event)">
-                    <div class="form-group"><label>Category</label><select id="itemCategorySelect" style="width:100%; padding:10px; background:#0a0a0a; color:white; border:1px solid var(--card-border); border-radius:6px;"><option value="coins">Coins</option><option value="vehicles">Vehicles</option><option value="properties">Properties</option></select></div>
-                    <div class="form-group"><label>Title</label><input type="text" id="itemTitleInput" required></div>
-                    <div class="form-group"><label>Price</label><input type="text" id="itemPriceInput" required></div>
-                    <div class="form-group"><label>Tag</label><input type="text" id="itemTagInput"></div>
-                    <div class="form-group"><label>Description</label><input type="text" id="itemDescInput"></div>
-                    <button type="submit" class="btn-primary">PUBLISH ITEM</button>
-                </form>
+<body class="panel-body">
+    <div class="panel-layout">
+        <aside class="panel-sidebar">
+            <h2>GBC PANEL</h2>
+            <div id="welcomeUserBanner" style="font-size: 0.8rem; color: var(--accent-gold); margin-bottom: 20px; word-break: break-all;">Loading User...</div>
+            <div class="tab-selector" style="display: flex; flex-direction: column; gap: 5px;">
+                <button class="tab-btn active" onclick="switchPanelTab('overview', this)">Overview</button>
+                <button class="tab-btn" id="tabOrdersBtn" style="display:none;" onclick="switchPanelTab('orders', this)">Bank Orders</button>
+                <button class="tab-btn" id="tabHomepageBtn" style="display:none;" onclick="switchPanelTab('homepage', this)">Homepage & Store</button>
+                <button class="tab-btn" id="tabPlayersBtn" style="display:none;" onclick="switchPanelTab('players', this)">Players Directory</button>
+                <button class="tab-btn" id="tabAdminsBtn" style="display:none;" onclick="switchPanelTab('admins', this)">Admin Team</button>
+                <button class="tab-btn" id="tabBankBtn" style="display:none;" onclick="switchPanelTab('bank', this)">Bank Account Setup</button>
+                <button class="tab-btn" id="tabStaffApprovalBtn" style="display:none;" onclick="switchPanelTab('staffApproval', this)">Staff Management</button>
             </div>
-            <div class="admin-form-container" style="max-width: 100%;">
-                <h3>Manage / Delete Existing Items</h3>
-                <div id="homepageItemsContainer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div>
+            <div style="margin-top: auto;">
+                <button class="btn-primary" style="background:#c0392b;" onclick="userLogout()">LOGOUT</button>
             </div>
-        </div>
-
-        <div class="panel-section" id="panelTab-players" style="display: none;"><div class="admin-form-container" style="max-width: 100%;"><h3>Players Directory</h3><div id="playersDirectoryContainer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div></div></div>
-        <div class="panel-section" id="panelTab-admins" style="display: none;"><div class="admin-form-container" style="max-width: 100%;"><h3>Active Admins</h3><div id="adminsDirectoryContainer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div></div></div>
-        <div class="panel-section" id="panelTab-bank" style="display: none;"><div class="admin-form-container" style="max-width: 100%;"><h3>Bank Configuration</h3><div class="form-group"><textarea id="bankInfoInput" rows="4"></textarea></div><button class="btn-primary" onclick="saveBankAccountInfo()">SAVE</button></div></div>
-        <div class="panel-section" id="panelTab-staff" style="display: none;">
-            <div class="admin-form-container" style="max-width: 100%; margin-bottom: 20px;"><h3>Pending Staff Applications</h3><div id="pendingStaffContainer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div></div>
-            <div class="admin-form-container" style="max-width: 100%;"><h3>Manage Staff Ranks & Assign Level 8 Owners</h3><div id="activeStaffContainer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div></div>
-        </div>
+        </aside>
+        <main class="panel-main">
+            <div class="panel-section" id="panelTab-overview">
+                <h2>Staff Control Dashboard</h2>
+                <p style="color: var(--text-muted); margin-top: 10px;">Welcome to the command center.</p>
+            </div>
+            <div class="panel-section" id="panelTab-orders" style="display: none;">
+                <div class="admin-form-container">
+                    <h3>Customer Orders & Bank Receipts</h3>
+                    <div id="ordersContainer"></div>
+                </div>
+            </div>
+            <div class="panel-section" id="panelTab-homepage" style="display: none;">
+                <div class="admin-form-container" style="margin-bottom: 20px;">
+                    <h3>Live Homepage Text Editor</h3>
+                    <form id="heroEditForm" onsubmit="handleSaveHeroSettings(event)">
+                        <label>Nav Badge / Server Tag</label>
+                        <input type="text" id="editNavBadge" required>
+                        <label>Hero Small Badge</label>
+                        <input type="text" id="editHeroBadge" required>
+                        <label>Main Headline Title</label>
+                        <input type="text" id="editHeroTitle" required>
+                        <label>Hero Description</label>
+                        <textarea id="editHeroDesc" rows="3" required></textarea>
+                        <button type="submit" class="btn-primary" style="margin-top: 10px;">SAVE CHANGES LIVE</button>
+                    </form>
+                </div>
+                <div class="admin-form-container">
+                    <h3>Marketplace Store Manager</h3>
+                    <form id="addItemForm" onsubmit="handleAddStoreItem(event)" style="margin-bottom: 20px;">
+                        <label>Category</label>
+                        <select id="itemCategorySelect" style="width:100%; padding:8px; background:#222; color:white; border:1px solid var(--card-border); border-radius:4px; margin-bottom:10px;">
+                            <option value="coins">Coins</option>
+                            <option value="vehicles">Vehicles</option>
+                            <option value="properties">Properties</option>
+                        </select>
+                        <label>Item Title</label>
+                        <input type="text" id="itemTitleInput" required>
+                        <label>Price</label>
+                        <input type="text" id="itemPriceInput" required>
+                        <label>Tag Badge</label>
+                        <input type="text" id="itemTagInput" required>
+                        <label>Description</label>
+                        <input type="text" id="itemDescInput" required>
+                        <button type="submit" class="btn-primary" style="margin-top:10px;">PUBLISH STORE ITEM</button>
+                    </form>
+                    <div id="storeItemsContainer"></div>
+                </div>
+            </div>
+            <div class="panel-section" id="panelTab-players" style="display: none;">
+                <div class="admin-form-container">
+                    <h3>Registered Players Directory</h3>
+                    <div id="playersDirectoryContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;"></div>
+                </div>
+            </div>
+            <div class="panel-section" id="panelTab-admins" style="display: none;">
+                <div class="admin-form-container">
+                    <h3>Approved Staff & Administration Team</h3>
+                    <div id="adminsDirectoryContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;"></div>
+                </div>
+            </div>
+            <div class="panel-section" id="panelTab-bank" style="display: none;">
+                <div class="admin-form-container">
+                    <h3>Admin Bank Account Selector</h3>
+                    <textarea id="bankInfoInput" rows="4" style="width:100%; padding:10px; background:#222; color:white; border:1px solid var(--card-border); border-radius:6px; margin-bottom:10px;"></textarea>
+                    <button class="btn-primary" onclick="saveBankAccountInfo()">UPDATE BANK DETAILS LIVE</button>
+                </div>
+            </div>
+            <div class="panel-section" id="panelTab-staffApproval" style="display: none;">
+                <div class="admin-form-container" style="margin-bottom: 20px;">
+                    <h3>Pending Staff Applications</h3>
+                    <div id="pendingStaffContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+                <div class="admin-form-container">
+                    <h3>Active Staff Ranks Control</h3>
+                    <div id="activeStaffContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+            </div>
+        </main>
     </div>
     <script src="script.js"></script>
     <script>
-        window.onload = () => {
+        window.addEventListener('DOMContentLoaded', () => {
             const user = sessionStorage.getItem('gbc_logged_in_user');
             if(!user) { window.location.href = 'staff-login.html'; return; }
             initializeStaffPanel(user);
-        };
+        });
     </script>
 </body>
-                                                                                   </html>
-                                                                                                                                                                       
+</html>
