@@ -3,53 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Billionaire City - Player Hub</title>
+    <title id="pageTitleMeta">GBC - Ultimate Roleplay Experience</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <nav>
-        <div class="nav-brand">
-            <span class="brand-badge">GBC</span>
-            <span class="brand-title">GRAND BILLIONAIRE CITY</span>
-        </div>
-        <div class="nav-actions">
-            <a href="marketplace.html" class="btn-nav">STOREFRONT</a>
-            <a href="faq.html" class="btn-nav">FAQ</a>
-            <div id="authNavArea">
-                <a href="login.html" class="btn-nav btn-nav-outline" id="loginBtnNav"><i class="fa-solid fa-right-to-bracket"></i> PLAYER LOGIN</a>
-            </div>
-        </div>
-    </nav>
 
-    <div class="page-view" style="max-width: 700px; text-align: center; margin-top: 60px;">
-        <div class="admin-form-container">
-            <span class="brand-badge" style="margin-bottom: 15px; display: inline-block;">WELCOME TO GBC</span>
-            <h1 style="color: var(--accent-gold); margin-bottom: 15px; font-size: 2.2rem;">The Ultimate Roleplay Experience</h1>
-            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 30px;">
-                Build your legacy, acquire high-tier vehicles, claim luxury properties, and network with elite players across Grand Billionaire City.
-            </p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <a href="marketplace.html" class="btn-primary" style="width: auto; padding: 12px 25px;">BROWSE MARKETPLACE</a>
-                <a href="login.html" class="btn-primary" style="width: auto; padding: 12px 25px; background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold);">ACCESS PORTAL</a>
-            </div>
-        </div>
+    <div class="announcement-bar">
+        <span class="badge" id="navBadge">GBC</span> 
+        <span id="lifeSupportSpeechText">⚠️ LIFE SUPPORT NOTICE: Keep your bank transfer receipts safe until admin verification is complete. Welcome to Grand Billionaire City!</span>
     </div>
 
+    <header class="navbar">
+        <div class="logo">GRAND BILLIONAIRE CITY</div>
+        <nav class="nav-links">
+            <a href="index.html" class="active">Home</a>
+            <a href="#store">Store</a>
+            <a href="login.html" id="authNavBtn">Player Login</a>
+            <a href="staff-login.html" class="staff-link">Staff Portal</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge" id="heroBadge">WELCOME TO GBC</span>
+            <h1 id="heroTitle">The Ultimate Roleplay Experience</h1>
+            <p id="heroDescription">Build your legacy, acquire high-tier vehicles, claim luxury properties, and network with elite players across Grand Billionaire City.</p>
+            <div class="hero-btns">
+                <a href="#store" class="btn-primary">Explore Store</a>
+                <a href="https://discord.gg/grnd" target="_blank" class="btn-secondary">Join Discord</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="store" class="store-section">
+        <div class="section-title">
+            <h2>Live Marketplace</h2>
+            <p>Select items and use our secure admin-backed direct bank transfer system.</p>
+        </div>
+        <div class="marketplace-grid" id="liveMarketplaceGrid"></div>
+    </section>
+
     <footer>
-        <a href="terms.html">Terms & Conditions</a>
-        <a href="faq.html">FAQ</a>
-        <a href="404.html">Support</a>
+        <p>&copy; 2026 Grand Billionaire City. All rights reserved.</p>
     </footer>
 
     <script src="script.js"></script>
     <script>
-        window.onload = () => {
-            const user = sessionStorage.getItem('gbc_logged_in_user');
-            if(user) {
-                document.getElementById('authNavArea').innerHTML = `<span style="color: var(--accent-gold); font-size: 0.85rem; font-weight: bold; margin-right: 10px;">Hi, ${user}</span><button class="btn-nav btn-danger" onclick="userLogout()" style="padding: 6px 12px;">LOGOUT</button>`;
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDynamicHomepage();
+            renderMarketplaceStorefront();
+            const loggedUser = sessionStorage.getItem('gbc_logged_in_user');
+            if(loggedUser) {
+                const btn = document.getElementById('authNavBtn');
+                btn.innerText = `Logout (${loggedUser})`;
+                btn.href = '#';
+                btn.onclick = userLogout;
             }
-        };
+        });
     </script>
 </body>
 </html>
