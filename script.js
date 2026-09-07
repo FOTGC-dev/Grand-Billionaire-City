@@ -54,7 +54,7 @@ async function getCurrentSession() {
     await supabaseClient.auth.getSession();
 
   if (error) {
-    console.error(error);
+    console.error("Session error:", error);
     return null;
   }
 
@@ -80,7 +80,7 @@ async function loadStore() {
     .order("id", { ascending: true });
 
   if (error) {
-    console.error(error);
+    console.error("Store error:", error);
     storeGrid.innerHTML =
       "<p>Unable to load store items.</p>";
     return;
@@ -145,7 +145,7 @@ async function handleLogin(event) {
   if (!login || !password) {
     showMessage(
       "login-message",
-      "Enter your login details.",
+      "Please enter your username/email and password.",
       "error"
     );
     return;
@@ -153,20 +153,23 @@ async function handleLogin(event) {
 
   showMessage(
     "login-message",
-    "Signing in..."
+    "Logging in..."
   );
 
   let email = login;
 
   if (!login.includes("@")) {
-    const { data, error } = await supabaseClient.rpc(
-      "get_login_email",
-      {
-        login_identifier: login
-      }
-    );
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_login_email",
+        {
+          login_identifier: login
+        }
+      );
 
     if (error || !data) {
+      console.error("Username lookup error:", error);
+
       showMessage(
         "login-message",
         "Username not found.",
@@ -185,6 +188,8 @@ async function handleLogin(event) {
     });
 
   if (error) {
+    console.error("Login error:", error);
+
     showMessage(
       "login-message",
       error.message,
@@ -204,10 +209,17 @@ async function handleLogin(event) {
 async function handleRegister(event) {
   event.preventDefault();
 
-  const usernameInput = getElement("register-username");
-  const emailInput = getElement("register-email");
-  const passwordInput = getElement("register-password");
-  const confirmInput = getElement("register-confirm-password");
+  const usernameInput =
+    getElement("register-username");
+
+  const emailInput =
+    getElement("register-email");
+
+  const passwordInput =
+    getElement("register-password");
+
+  const confirmInput =
+    getElement("register-confirm-password");
 
   if (
     !usernameInput ||
@@ -215,6 +227,11 @@ async function handleRegister(event) {
     !passwordInput ||
     !confirmInput
   ) {
+    showMessage(
+      "register-message",
+      "Registration form is incomplete.",
+      "error"
+    );
     return;
   }
 
@@ -223,10 +240,10 @@ async function handleRegister(event) {
   const password = passwordInput.value;
   const confirmPassword = confirmInput.value;
 
-  if (password !== confirmPassword) {
+  if (!username || !email || !password || !confirmPassword) {
     showMessage(
       "register-message",
-      "Passwords do not match.",
+      "Please complete every field.",
       "error"
     );
     return;
@@ -241,9 +258,18 @@ async function handleRegister(event) {
     return;
   }
 
+  if (password !== confirmPassword) {
+    showMessage(
+      "register-message",
+      "Passwords do not match.",
+      "error"
+    );
+    return;
+  }
+
   showMessage(
     "register-message",
-    "Creating account..."
+    "Creating your account..."
   );
 
   const { data, error } =
@@ -258,6 +284,8 @@ async function handleRegister(event) {
     });
 
   if (error) {
+    console.error("Registration error:", error);
+
     showMessage(
       "register-message",
       error.message,
@@ -273,7 +301,7 @@ async function handleRegister(event) {
 
   showMessage(
     "register-message",
-    "Registration successful. Check your email if confirmation is required.",
+    "Account created. Check your email to confirm your account.",
     "success"
   );
 }
@@ -284,9 +312,14 @@ async function handleRegister(event) {
 ========================= */
 
 async function loadAccountPage() {
-  const usernameElement = getElement("account-username");
-  const profileUsername = getElement("profile-username");
-  const profileEmail = getElement("profile-email");
+  const usernameElement =
+    getElement("account-username");
+
+  const profileUsername =
+    getElement("profile-username");
+
+  const profileEmail =
+    getElement("profile-email");
 
   if (
     !usernameElement &&
@@ -313,7 +346,7 @@ async function loadAccountPage() {
       .maybeSingle();
 
   if (error) {
-    console.error(error);
+    console.error("Profile error:", error);
   }
 
   const username =
@@ -343,14 +376,16 @@ async function loadPlayerOrders(userId) {
 
   ordersList.innerHTML = "<p>Loading orders...</p>";
 
-  const { data, error } = await supabaseClient
-    .from("orders")
-    .select("*")
-    .eq("user_id", userId)
-    .order("id", { ascending: false });
+  const { data, error } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .eq("user_id", userId)
+      .order("id", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Orders error:", error);
+
     ordersList.innerHTML =
       "<p>Unable to load your orders.</p>";
     return;
@@ -377,8 +412,13 @@ async function loadPlayerOrders(userId) {
       <h3>${escapeHTML(order.item_title)}</h3>
 
       <div class="order-meta">
-        <span>Order ID: ${escapeHTML(order.order_id)}</span>
-        <span>${formatPrice(order.item_price)}</span>
+        <span>
+          Order ID: ${escapeHTML(order.order_id)}
+        </span>
+
+        <span>
+          ${formatPrice(order.item_price)}
+        </span>
       </div>
 
       <p>
@@ -405,14 +445,16 @@ async function loadPurchaseItems() {
 
   if (!itemSelect) return;
 
-  const { data, error } = await supabaseClient
-    .from("store_items")
-    .select("*")
-    .eq("active", true)
-    .order("id", { ascending: true });
+  const { data, error } =
+    await supabaseClient
+      .from("store_items")
+      .select("*")
+      .eq("active", true)
+      .order("id", { ascending: true });
 
   if (error) {
-    console.error(error);
+    console.error("Purchase items error:", error);
+
     showMessage(
       "purchase-message",
       "Unable to load store items.",
@@ -425,13 +467,17 @@ async function loadPurchaseItems() {
 
   itemSelect.innerHTML = "";
 
-  const defaultOption = document.createElement("option");
+  const defaultOption =
+    document.createElement("option");
+
   defaultOption.value = "";
   defaultOption.textContent = "Select an item...";
+
   itemSelect.appendChild(defaultOption);
 
   purchaseItems.forEach((item) => {
-    const option = document.createElement("option");
+    const option =
+      document.createElement("option");
 
     option.value = item.id;
     option.textContent =
@@ -440,9 +486,8 @@ async function loadPurchaseItems() {
     itemSelect.appendChild(option);
   });
 
-  const params = new URLSearchParams(
-    window.location.search
-  );
+  const params =
+    new URLSearchParams(window.location.search);
 
   const selectedItem = params.get("item");
 
@@ -455,13 +500,15 @@ async function loadPurchaseItems() {
 
 function updateSelectedItem() {
   const itemSelect = getElement("purchase-item");
-  const selectedItemElement = getElement("selected-item");
+  const selectedItemElement =
+    getElement("selected-item");
 
   if (!itemSelect || !selectedItemElement) return;
 
   const item = purchaseItems.find(
     (storeItem) =>
-      String(storeItem.id) === String(itemSelect.value)
+      String(storeItem.id) ===
+      String(itemSelect.value)
   );
 
   if (!item) {
@@ -472,33 +519,46 @@ function updateSelectedItem() {
 
   selectedItemElement.innerHTML = `
     <h3>${escapeHTML(item.title)}</h3>
-    <p>${escapeHTML(item.description || "")}</p>
-    <strong>${formatPrice(item.price)}</strong>
+
+    <p>
+      ${escapeHTML(item.description || "")}
+    </p>
+
+    <strong>
+      ${formatPrice(item.price)}
+    </strong>
   `;
 }
 
 async function loadBankDetails() {
   const bankName = getElement("bank-name");
   const bankAccount = getElement("bank-account");
-  const bankAccountName = getElement("bank-account-name");
+  const bankAccountName =
+    getElement("bank-account-name");
 
-  if (!bankName && !bankAccount && !bankAccountName) {
+  if (
+    !bankName &&
+    !bankAccount &&
+    !bankAccountName
+  ) {
     return;
   }
 
-  const { data, error } = await supabaseClient
-    .from("site_config")
-    .select("*")
-    .limit(1)
-    .maybeSingle();
+  const { data, error } =
+    await supabaseClient
+      .from("site_config")
+      .select("*")
+      .limit(1)
+      .maybeSingle();
 
   if (error) {
-    console.error(error);
+    console.error("Bank details error:", error);
     return;
   }
 
   if (bankName) {
-    bankName.textContent = data?.bank_name || "Not available";
+    bankName.textContent =
+      data?.bank_name || "Not available";
   }
 
   if (bankAccount) {
@@ -523,13 +583,15 @@ async function handlePurchase(event) {
   }
 
   const itemSelect = getElement("purchase-item");
-  const receiptInput = getElement("purchase-receipt");
+  const receiptInput =
+    getElement("purchase-receipt");
 
   if (!itemSelect || !receiptInput) return;
 
   const item = purchaseItems.find(
     (storeItem) =>
-      String(storeItem.id) === String(itemSelect.value)
+      String(storeItem.id) ===
+      String(itemSelect.value)
   );
 
   if (!item) {
@@ -571,7 +633,7 @@ async function handlePurchase(event) {
       .upload(receiptPath, receiptFile);
 
   if (uploadError) {
-    console.error(uploadError);
+    console.error("Receipt upload error:", uploadError);
 
     showMessage(
       "purchase-message",
@@ -599,7 +661,7 @@ async function handlePurchase(event) {
       });
 
   if (orderError) {
-    console.error(orderError);
+    console.error("Order insert error:", orderError);
 
     showMessage(
       "purchase-message",
@@ -621,12 +683,22 @@ async function handleStaffLogin(event) {
   event.preventDefault();
 
   const loginInput = getElement("staff-login");
-  const passwordInput = getElement("staff-password");
+  const passwordInput =
+    getElement("staff-password");
 
   if (!loginInput || !passwordInput) return;
 
   const login = loginInput.value.trim();
   const password = passwordInput.value;
+
+  if (!login || !password) {
+    showMessage(
+      "staff-login-message",
+      "Enter your staff login details.",
+      "error"
+    );
+    return;
+  }
 
   showMessage(
     "staff-login-message",
@@ -663,6 +735,8 @@ async function handleStaffLogin(event) {
     });
 
   if (error) {
+    console.error("Staff login error:", error);
+
     showMessage(
       "staff-login-message",
       error.message,
@@ -704,7 +778,8 @@ async function handleStaffLogin(event) {
 ========================= */
 
 async function loadStaffPanel() {
-  const panelName = getElement("staff-panel-name");
+  const panelName =
+    getElement("staff-panel-name");
 
   if (!panelName) return;
 
@@ -737,6 +812,7 @@ async function loadStaffPanel() {
     staff.active !== true
   ) {
     await supabaseClient.auth.signOut();
+
     window.location.href = "staff-login.html";
     return;
   }
@@ -748,8 +824,11 @@ async function loadStaffPanel() {
     session.user.email ||
     "Staff Member";
 
-  const roleElement = getElement("staff-panel-role");
-  const levelElement = getElement("staff-panel-level");
+  const roleElement =
+    getElement("staff-panel-role");
+
+  const levelElement =
+    getElement("staff-panel-level");
 
   if (roleElement) {
     roleElement.textContent =
@@ -760,10 +839,17 @@ async function loadStaffPanel() {
     levelElement.textContent = level;
   }
 
-  const ordersCard = getElement("orders-panel-card");
-  const storeCard = getElement("store-panel-card");
-  const bankCard = getElement("bank-panel-card");
-  const managementCard = getElement("staff-management-card");
+  const ordersCard =
+    getElement("orders-panel-card");
+
+  const storeCard =
+    getElement("store-panel-card");
+
+  const bankCard =
+    getElement("bank-panel-card");
+
+  const managementCard =
+    getElement("staff-management-card");
 
   if (level >= 2 && ordersCard) {
     ordersCard.classList.remove("hidden");
@@ -791,11 +877,13 @@ async function loadStaffPanel() {
 ========================= */
 
 async function loadStaffOrders() {
-  const ordersList = getElement("staff-orders-list");
+  const ordersList =
+    getElement("staff-orders-list");
 
   if (!ordersList) return;
 
-  ordersList.innerHTML = "<p>Loading orders...</p>";
+  ordersList.innerHTML =
+    "<p>Loading orders...</p>";
 
   const { data, error } =
     await supabaseClient
@@ -804,7 +892,8 @@ async function loadStaffOrders() {
       .order("id", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Staff orders error:", error);
+
     ordersList.innerHTML =
       "<p>Unable to load orders.</p>";
     return;
@@ -828,7 +917,9 @@ async function loadStaffOrders() {
     card.className = "staff-order-card";
 
     card.innerHTML = `
-      <h3>${escapeHTML(order.item_title)}</h3>
+      <h3>
+        ${escapeHTML(order.item_title)}
+      </h3>
 
       <p>
         Order ID:
@@ -878,10 +969,16 @@ async function loadStaffOrders() {
     .querySelectorAll("[data-order-action]")
     .forEach((button) => {
       button.addEventListener("click", async () => {
-        const orderId = button.dataset.orderId;
-        const newStatus = button.dataset.orderAction;
+        const orderId =
+          button.dataset.orderId;
 
-        await updateOrderStatus(orderId, newStatus);
+        const newStatus =
+          button.dataset.orderAction;
+
+        await updateOrderStatus(
+          orderId,
+          newStatus
+        );
       });
     });
 }
@@ -894,6 +991,8 @@ async function updateOrderStatus(orderId, status) {
       .eq("id", orderId);
 
   if (error) {
+    console.error("Update order error:", error);
+
     showMessage(
       "panel-message",
       error.message,
@@ -917,9 +1016,13 @@ async function updateOrderStatus(orderId, status) {
 ========================= */
 
 async function loadStaffStoreItems() {
-  const storeList = getElement("staff-store-list");
+  const storeList =
+    getElement("staff-store-list");
 
   if (!storeList) return;
+
+  storeList.innerHTML =
+    "<p>Loading store items...</p>";
 
   const { data, error } =
     await supabaseClient
@@ -928,7 +1031,8 @@ async function loadStaffStoreItems() {
       .order("id", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Staff store error:", error);
+
     storeList.innerHTML =
       "<p>Unable to load store items.</p>";
     return;
@@ -943,9 +1047,11 @@ async function loadStaffStoreItems() {
   }
 
   data.forEach((item) => {
-    const itemElement = document.createElement("article");
+    const itemElement =
+      document.createElement("article");
 
-    itemElement.className = "staff-store-item";
+    itemElement.className =
+      "staff-store-item";
 
     itemElement.innerHTML = `
       <h3>${escapeHTML(item.title)}</h3>
@@ -971,10 +1077,18 @@ async function loadStaffStoreItems() {
 async function handleStoreItemCreation(event) {
   event.preventDefault();
 
-  const category = getElement("store-category")?.value.trim();
-  const title = getElement("store-title")?.value.trim();
-  const price = Number(getElement("store-price")?.value);
-  const tag = getElement("store-tag")?.value.trim();
+  const category =
+    getElement("store-category")?.value.trim();
+
+  const title =
+    getElement("store-title")?.value.trim();
+
+  const price =
+    Number(getElement("store-price")?.value);
+
+  const tag =
+    getElement("store-tag")?.value.trim();
+
   const description =
     getElement("store-description")?.value.trim();
 
@@ -1000,6 +1114,8 @@ async function handleStoreItemCreation(event) {
       });
 
   if (error) {
+    console.error("Create store item error:", error);
+
     showMessage(
       "panel-message",
       error.message,
@@ -1032,22 +1148,32 @@ async function loadStaffBankDetails() {
       .limit(1)
       .maybeSingle();
 
-  if (error || !data) return;
+  if (error || !data) {
+    console.error("Staff bank error:", error);
+    return;
+  }
 
-  const bankName = getElement("bank-config-name");
-  const accountNumber = getElement("bank-config-number");
-  const accountName = getElement("bank-config-owner");
+  const bankName =
+    getElement("bank-config-name");
+
+  const accountNumber =
+    getElement("bank-config-number");
+
+  const accountName =
+    getElement("bank-config-owner");
 
   if (bankName) {
     bankName.value = data.bank_name || "";
   }
 
   if (accountNumber) {
-    accountNumber.value = data.account_number || "";
+    accountNumber.value =
+      data.account_number || "";
   }
 
   if (accountName) {
-    accountName.value = data.account_name || "";
+    accountName.value =
+      data.account_name || "";
   }
 }
 
@@ -1101,6 +1227,11 @@ async function handleBankDetailsSave(event) {
   }
 
   if (result.error) {
+    console.error(
+      "Save bank details error:",
+      result.error
+    );
+
     showMessage(
       "panel-message",
       result.error.message,
@@ -1123,11 +1254,13 @@ async function handleBankDetailsSave(event) {
 
 async function logoutPlayer() {
   await supabaseClient.auth.signOut();
+
   window.location.href = "login.html";
 }
 
 async function logoutStaff() {
   await supabaseClient.auth.signOut();
+
   window.location.href = "staff-login.html";
 }
 
@@ -1143,7 +1276,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadBankDetails();
   loadStaffPanel();
 
-  const loginForm = getElement("login-form");
+  const loginForm =
+    getElement("login-form");
 
   if (loginForm) {
     loginForm.addEventListener(
@@ -1152,7 +1286,8 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  const registerForm = getElement("register-form");
+  const registerForm =
+    getElement("register-form");
 
   if (registerForm) {
     registerForm.addEventListener(
@@ -1238,10 +1373,13 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshOrders.addEventListener(
       "click",
       async () => {
-        const session = await getCurrentSession();
+        const session =
+          await getCurrentSession();
 
         if (session) {
-          await loadPlayerOrders(session.user.id);
+          await loadPlayerOrders(
+            session.user.id
+          );
         }
       }
     );
