@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Billionaire City - User Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <nav>
+        <div class="nav-brand">
+            <span class="brand-badge">GBC</span>
+            <span class="brand-title">PLAYER PROFILE DASHBOARD</span>
+        </div>
+        <div class="nav-actions">
+            <a href="marketplace.html" class="btn-nav btn-nav-outline">STORE</a>
+            <button class="btn-nav btn-danger" onclick="userLogout()">LOGOUT</button>
+        </div>
+    </nav>
+
+    <div class="page-view" style="max-width: 800px; margin-top: 30px;">
+        <div class="admin-form-container" style="max-width: 100%; margin-bottom: 25px;">
+            <h2 id="profileUsernameHeader" style="color: var(--accent-gold); margin-bottom: 5px;">Player Profile</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Manage your active session details and personal order ledger.</p>
+        </div>
+
+        <div class="section-title">📦 Your Recent WhatsApp Checkouts</div>
+        <div class="admin-form-container" style="max-width: 100%;">
+            <div id="userOrderHistory" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="color: var(--text-muted); text-align: center;">No orders found.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2022-2026 GRAND BILLIONAIRE CITY • USER DASHBOARD</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        window.onload = () => {
+            const user = sessionStorage.getItem('gbc_logged_in_user');
+            if(!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('profileUsernameHeader').innerText = `Profile: ${user}`;
+            loadUserOrderHistory(user);
+        };
+    </script>
+</body>
+</html>
