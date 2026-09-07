@@ -3,126 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Billionaire City - Staff Panel</title>
+    <title>Grand Billionaire City - Unified Control Panel</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <nav>
         <div class="nav-brand">
             <span class="brand-badge">GBC</span>
-            <span class="brand-title">STAFF PORTAL</span>
+            <span class="brand-title">STAFF CONTROL PORTAL</span>
         </div>
         <div class="nav-actions">
-            <a href="index.html" class="btn-nav btn-nav-outline">HOME</a>
-            <a href="marketplace.html" class="btn-nav btn-nav-outline">STORE</a>
-            <button id="logoutBtn" class="btn-nav btn-danger" style="display: none;" onclick="userLogout()">LOGOUT</button>
+            <span id="welcomeUserBanner" style="font-size: 0.85rem; color: var(--accent-gold);"></span>
+            <a href="marketplace.html" class="btn-nav btn-nav-outline">STORE FRONT</a>
+            <button class="btn-nav btn-danger" id="logoutBtn" style="display:none;" onclick="userLogout()">LOGOUT</button>
         </div>
     </nav>
 
-    <div class="page-view">
-        <!-- AUTH SCREEN (Register or Login) -->
-        <div id="authScreen" class="admin-form-container" style="margin-top: 40px;">
+    <!-- AUTHENTICATION SCREEN -->
+    <div class="page-view" id="authScreen" style="max-width: 450px; margin-top: 50px;">
+        <div class="admin-form-container">
+            <h2 style="margin-bottom: 20px; text-align: center;">Staff & User Portal</h2>
             <div class="tab-selector">
-                <button id="tabLoginBtn" class="tab-btn active" onclick="switchAuthTab('login')">LOG IN</button>
-                <button id="tabRegisterBtn" class="tab-btn" onclick="switchAuthTab('register')">REGISTER ACCOUNT</button>
+                <button class="tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">Login</button>
+                <button class="tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">Register</button>
             </div>
 
             <!-- Login Form -->
             <form id="loginForm" onsubmit="handleUserLogin(event)">
-                <div class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Staff Sign In</div>
                 <div class="form-group">
-                    <label>Username / Email</label>
-                    <input type="text" id="loginUser" placeholder="Enter username" required>
+                    <label>Username or Email</label>
+                    <input type="text" id="loginUser" required placeholder="admin or user">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="loginPass" placeholder="••••••••" required>
+                    <input type="password" id="loginPass" required placeholder="••••••••">
                 </div>
-                <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 12px;">LOG IN</button>
+                <button type="submit" class="btn-primary">ACCESS PANEL</button>
             </form>
 
             <!-- Register Form -->
             <form id="registerForm" style="display: none;" onsubmit="handleUserRegister(event)">
-                <div class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Create Staff Account</div>
                 <div class="form-group">
-                    <label>Choose Username</label>
-                    <input type="text" id="regUser" placeholder="Choose username" required>
+                    <label>Username</label>
+                    <input type="text" id="regUser" required>
                 </div>
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" id="regEmail" placeholder="your@email.com" required>
+                    <input type="email" id="regEmail" required>
                 </div>
                 <div class="form-group">
-                    <label>Create Password</label>
-                    <input type="password" id="regPass" placeholder="••••••••" required>
+                    <label>Password</label>
+                    <input type="password" id="regPass" required>
                 </div>
-                <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 12px;">REGISTER & LOGIN</button>
+                <button type="submit" class="btn-primary">CREATE ACCOUNT</button>
             </form>
         </div>
+    </div>
 
-        <!-- UPLOAD PANEL SCREEN (Unlocked upon login) -->
-        <div id="panelScreen" style="display: none;">
-            <div id="welcomeUserBanner" style="text-align: center; margin-bottom: 25px; color: var(--accent-gold); font-weight: 700;"></div>
-            <div class="section-title" style="text-align: center; justify-content: center;">UPLOAD ITEM TO MARKETPLACE</div>
-            <div class="admin-form-container">
+    <!-- UNIFIED DASHBOARD PANEL SCREEN (ROLE-BASED TABS) -->
+    <div class="page-view" id="panelScreen" style="display: none; max-width: 900px; margin-top: 20px;">
+        <div class="tab-selector" style="margin-bottom: 25px;">
+            <button class="tab-btn active" onclick="switchPanelTab('items', this)"><i class="fa-solid fa-boxes-stacked"></i> Item Manager</button>
+            <button class="tab-btn" onclick="switchPanelTab('support', this)"><i class="fa-solid fa-headset"></i> Live Support Desk</button>
+            <button class="tab-btn" onclick="switchPanelTab('orders', this)"><i class="fa-solid fa-receipt"></i> Order Logs</button>
+        </div>
+
+        <!-- TAB 1: ITEM MANAGER -->
+        <div class="panel-section" id="panelTab-items">
+            <div class="admin-form-container" style="max-width: 100%;">
+                <h3 style="margin-bottom: 15px;">Publish Marketplace Item</h3>
                 <form id="uploadForm" onsubmit="handleItemUpload(event)">
                     <div class="form-group">
-                        <label for="itemCategory">Select Target Category</label>
-                        <select id="itemCategory" required>
-                            <option value="coins">Buy GC Coin</option>
+                        <label>Category Section</label>
+                        <select id="itemCategory">
+                            <option value="coins">GC Coins</option>
                             <option value="donators">Donator Tiers</option>
                             <option value="properties">Property Listings</option>
                             <option value="business">Business Properties</option>
-                            <option value="vehicles" selected>Vehicle Collection</option>
+                            <option value="vehicles">Vehicle Collection</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="itemTitle">Item Name</label>
-                        <input type="text" id="itemTitle" placeholder="e.g. Porsche 911 Turbo S" required>
+                        <label>Item Title</label>
+                        <input type="text" id="itemTitle" required placeholder="e.g. Skyline GT-R">
                     </div>
                     <div class="form-group">
-                        <label for="itemPrice">Price / Cost Display</label>
-                        <input type="text" id="itemPrice" placeholder="e.g. 34 GC" required>
+                        <label>Price Display</label>
+                        <input type="text" id="itemPrice" required placeholder="e.g. 25 GC">
                     </div>
                     <div class="form-group">
-                        <label for="itemTag">Badge / Stock Tag</label>
-                        <input type="text" id="itemTag" placeholder="e.g. STOCK 5 • 10% OFF" required>
+                        <label>Tag Badge</label>
+                        <input type="text" id="itemTag" required placeholder="e.g. 10% OFF / STOCK 3">
                     </div>
-
-                    <!-- IMAGE INPUT METHOD TOGGLE (URL OR FILE UPLOAD) -->
                     <div class="form-group">
-                        <label>Item Image Source</label>
-                        <div class="tab-selector">
-                            <button type="button" id="imgTabUrl" class="tab-btn active" onclick="switchImgInput('url')">Paste Image URL</button>
-                            <button type="button" id="imgTabFile" class="tab-btn" onclick="switchImgInput('file')">Upload from Device</button>
+                        <label>Description</label>
+                        <textarea id="itemDesc" rows="3" placeholder="Item perks or specs..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Image Source</label>
+                        <div class="tab-selector" style="margin-bottom: 8px;">
+                            <button type="button" class="tab-btn active" id="imgTabUrl" onclick="switchImgInput('url')">Image URL</button>
+                            <button type="button" class="tab-btn" id="imgTabFile" onclick="switchImgInput('file')">Upload File</button>
                         </div>
                         <div id="urlInputBox">
-                            <input type="url" id="itemImage" placeholder="https://images.unsplash.com/...">
+                            <input type="url" id="itemImage" placeholder="https://image-link.com/photo.jpg">
                         </div>
                         <div id="fileInputBox" style="display: none;">
                             <input type="file" id="itemFile" accept="image/*">
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="itemDesc">Description / Perks / Real-world equivalent</label>
-                        <textarea id="itemDesc" rows="3" placeholder="Game Value: 75M • $1.35 • ₦2,000" required></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 14px;">PUBLISH TO MARKETPLACE</button>
+                    <button type="submit" class="btn-primary">PUBLISH ITEM</button>
                 </form>
             </div>
         </div>
-    </div>
 
-    <footer>
-        <p>© 2022-2026 GRAND BILLIONAIRE CITY • GC COIN OFFICIAL</p>
-    </footer>
+        <!-- TAB 2: LIVE SUPPORT DESK -->
+        <div class="panel-section" id="panelTab-support" style="display: none;">
+            <div class="admin-form-container" style="max-width: 100%;">
+                <h3 style="margin-bottom: 15px;">Live Customer Chat Control</h3>
+                <div id="adminChatLog" style="height: 350px; background: #0a0a0a; border: 1px solid var(--card-border); border-radius: 8px; padding: 15px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px;">
+                    <p style="color: var(--text-muted); text-align: center;">Waiting for player messages...</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="adminReplyInput" placeholder="Reply to customer as support staff..." style="flex: 1; padding: 12px; background: #0a0a0a; border: 1px solid var(--card-border); color: white; border-radius: 6px;" onkeypress="handleAdminEnter(event)">
+                    <button class="btn-primary" style="width: auto; padding: 0 20px;" onclick="sendAdminReply()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ORDER LOGS -->
+        <div class="panel-section" id="panelTab-orders" style="display: none;">
+            <div class="admin-form-container" style="max-width: 100%;">
+                <h3 style="margin-bottom: 15px;">Recent WhatsApp Checkout Logs</h3>
+                <div id="orderLogsContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                    <p style="color: var(--text-muted); text-align: center;">No orders recorded yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
     <script>
         window.onload = () => {
             checkUserAuth();
+            loadAdminChatSession();
+            loadOrderLogs();
+            setInterval(() => {
+                loadAdminChatSession();
+                loadOrderLogs();
+            }, 2500);
         };
     </script>
 </body>
