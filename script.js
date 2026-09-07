@@ -1,129 +1,69 @@
-document.addEventListener("DOMContentLoaded", () => {
-    async function loadComponent(id, file) {
-        const element = document.getElementById(id);
-        if (element) {
-            try {
-                const response = await fetch(file);
-                if (response.ok) {
-                    element.innerHTML = await response.text();
-                    if (id === 'site-header') {
-                        initMobileMenu();
-                    }
-                }
-            } catch (error) {
-                console.error(`Error loading ${file}:`, error);
-            }
-        }
+// Default items array if storage is empty
+const defaultItems = [
+    {
+        title: "Porsche 911 Turbo S White",
+        price: "34",
+        tag: "STOCK 5 • 10% OFF",
+        image: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=600&q=80",
+        desc: "Game Value: 75M • Ratio pricing applied"
+    },
+    {
+        title: "Bugatti Chiron Super Sport",
+        price: "63",
+        tag: "STOCK 5 • 10% OFF",
+        image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=600&q=80",
+        desc: "Game Value: 140M • Ratio pricing applied"
     }
+];
 
-    loadComponent('site-header', 'header.html');
-    loadComponent('site-footer', 'footer.html');
-
-    initLoader();
-    initStatsCounter();
-    initBentoSpotlight();
-});
-
-function initMobileMenu() {
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobileDrawer = document.getElementById('mobileDrawer');
-    const mobileLinks = document.querySelectorAll('.mobile-link');
-
-    if (mobileMenuBtn && mobileDrawer) {
-        mobileMenuBtn.addEventListener('click', () => {
-            const isOpen = mobileMenuBtn.classList.toggle('active');
-            mobileDrawer.classList.toggle('open', isOpen);
-            document.body.style.overflow = isOpen ? 'hidden' : '';
-        });
-
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenuBtn.classList.remove('active');
-                mobileDrawer.classList.remove('open');
-                document.body.style.overflow = '';
-            });
-        });
-    }
+// Load items from localStorage or fallback to default
+function getItems() {
+    const saved = localStorage.getItem('gbc_marketplace_items');
+    return saved ? JSON.parse(saved) : defaultItems;
 }
 
-function initLoader() {
-    const loader = document.getElementById('empire-loader');
-    const progressFill = document.getElementById('loaderProgress');
-    const loaderStatus = document.getElementById('loaderStatus');
+// Render Marketplace items onto marketplace.html
+function renderMarketplace() {
+    const grid = document.getElementById('marketplace-grid');
+    if (!grid) return; // Exit if not on the marketplace page
+    
+    const items = getItems();
+    grid.innerHTML = '';
 
-    if (!loader || !progressFill || !loaderStatus) return;
-
-    const statuses = [
-        "Initializing Crimson Atmosphere...",
-        "Calibrating Sovereign Factions...",
-        "Securing Economic Protocols...",
-        "Welcome to the Empire."
-    ];
-
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 12) + 5;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(interval);
-            loader.classList.add('fade-out');
-            setTimeout(() => { loader.style.display = 'none'; }, 1000);
-        }
-        progressFill.style.width = `${progress}%`;
-        if (progress > 75) loaderStatus.textContent = statuses[3];
-        else if (progress > 45) loaderStatus.textContent = statuses[2];
-        else if (progress > 20) loaderStatus.textContent = statuses[1];
-    }, 80);
+    items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <img class="card-img" src="${item.image}" alt="${item.title}">
+            <div class="card-body">
+                <span class="badge-tag">${item.tag}</span>
+                <div class="card-title">${item.title}</div>
+                <div class="card-desc">${item.desc}</div>
+                <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 12px;">${item.price} GC</div>
+                <button class="btn-primary btn-danger">ADD TO CART - ${item.price} GC</button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
 }
 
-function initStatsCounter() {
-    const statNumbers = document.querySelectorAll('.empire-stat-number');
-    if (statNumbers.length === 0) return;
-
-    let animated = false;
-    const runCounters = () => {
-        statNumbers.forEach(counter => {
-            const target = +counter.getAttribute('data-target');
-            let current = 0;
-            const increment = target / 50;
-
-            const updateCount = () => {
-                current += increment;
-                if (current < target) {
-                    counter.textContent = `${Math.ceil(current)}+`;
-                    requestAnimationFrame(updateCount);
-                } else {
-                    counter.textContent = `${target}+`;
-                }
-            };
-            updateCount();
-        });
+// Handle item upload from panel.html form
+function handleItemUpload(event) {
+    event.preventDefault();
+    
+    const newItem = {
+        title: document.getElementById('itemTitle').value,
+        price: document.getElementById('itemPrice').value,
+        tag: document.getElementById('itemTag').value,
+        image: document.getElementById('itemImage').value,
+        desc: document.getElementById('itemDesc').value
     };
 
-    const observer = new IntersectionObserver((entries, observerInstance) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && !animated) {
-                animated = true;
-                runCounters();
-                observerInstance.disconnect();
-            }
-        });
-    }, { threshold: 0.3 });
+    const items = getItems();
+    items.unshift(newItem); // Add new upload to the top
+    localStorage.setItem('gbc_marketplace_items', JSON.stringify(items));
 
-    const statsStrip = document.querySelector('.stats-strip');
-    if (statsStrip) observer.observe(statsStrip);
-}
-
-function initBentoSpotlight() {
-    const bentoGrid = document.querySelector('.bento-grid');
-    if (!bentoGrid) return;
-
-    bentoGrid.addEventListener('mousemove', (e) => {
-        const cards = bentoGrid.querySelectorAll('.bento-card');
-        cards.forEach(card => {
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-            card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-        });
-    });
+    alert('Item uploaded successfully! Redirecting to marketplace...');
+    document.getElementById('uploadForm').reset();
+    window.location.href = 'marketplace.html';
 }
