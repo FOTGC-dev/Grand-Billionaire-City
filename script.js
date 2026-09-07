@@ -1,4 +1,3 @@
-// Default mock database across categories
 const defaultStoreData = {
     coins: [
         { title: "1 GC COIN", price: "1 GC", tag: "INSTANT", desc: "$0.27 • ₦400", image: "" },
@@ -31,7 +30,6 @@ function getStoreData() {
     return saved ? JSON.parse(saved) : defaultStoreData;
 }
 
-// Render store sections on marketplace.html with WhatsApp order encoding
 function renderMarketplace() {
     const data = getStoreData();
     const sectionMapping = {
@@ -69,13 +67,10 @@ function renderMarketplace() {
     }
 }
 
-// Encode order and redirect straight to official WhatsApp number/chat
 function orderItemWhatsApp(title, price) {
     const orderId = 'GBC-' + Math.floor(100000 + Math.random() * 900000);
     const message = `Hello Grand Billionaire City Support, I would like to purchase:\n\n📦 Item: ${title}\n💎 Price: ${price}\n🆔 Order ID: ${orderId}\n\nPlease verify and send payment/in-game delivery instructions.`;
     const encoded = encodeURIComponent(message);
-    
-    // Replace with your actual WhatsApp business line if needed
     const whatsappNumber = "2348000000000"; 
     window.open(`https://wa.me/${whatsappNumber}?text=${encoded}`, '_blank');
 }
@@ -89,61 +84,142 @@ function sendContactEmail(e) {
     const name = document.getElementById('contactName').value;
     const email = document.getElementById('contactEmail').value;
     const msg = document.getElementById('contactMsg').value;
-    
-    alert(`Thank you ${name}! Your message has been sent to grandbillionairecity@gmail.com. We will respond via email or WhatsApp shortly.`);
+    alert(`Thank you ${name}! Your message has been sent to grandbillionairecity@gmail.com.`);
     e.target.reset();
 }
 
-// Staff Login Management for panel.html
-function checkStaffAuth() {
-    const isAuthed = sessionStorage.getItem('gbc_staff_logged_in') === 'true';
-    const loginScreen = document.getElementById('loginScreen');
+// Auth Tabs & Registration Management
+function switchAuthTab(tab) {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const tabLoginBtn = document.getElementById('tabLoginBtn');
+    const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+
+    if (tab === 'login') {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        tabLoginBtn.classList.add('active');
+        tabRegisterBtn.classList.remove('active');
+    } else {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        tabRegisterBtn.classList.add('active');
+        tabLoginBtn.classList.remove('active');
+    }
+}
+
+function handleUserRegister(e) {
+    e.preventDefault();
+    const username = document.getElementById('regUser').value;
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPass').value;
+
+    const users = JSON.parse(localStorage.getItem('gbc_registered_users') || '[]');
+    if (users.some(u => u.username === username)) {
+        alert('Username already exists! Choose another.');
+        return;
+    }
+
+    users.push({ username, email, pass });
+    localStorage.setItem('gbc_registered_users', JSON.stringify(users));
+    
+    sessionStorage.setItem('gbc_logged_in_user', username);
+    alert('Account created and logged in successfully!');
+    checkUserAuth();
+}
+
+function handleUserLogin(e) {
+    e.preventDefault();
+    const identifier = document.getElementById('loginUser').value;
+    const pass = document.getElementById('loginPass').value;
+
+    // Allow default admin credentials or registered users
+    if (identifier === 'admin' && pass === 'gbc2026admin') {
+        sessionStorage.setItem('gbc_logged_in_user', 'Administrator');
+        checkUserAuth();
+        return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('gbc_registered_users') || '[]');
+    const found = users.find(u => (u.username === identifier || u.email === identifier) && u.pass === pass);
+
+    if (found) {
+        sessionStorage.setItem('gbc_logged_in_user', found.username);
+        checkUserAuth();
+    } else {
+        alert('Invalid username/email or password!');
+    }
+}
+
+function userLogout() {
+    sessionStorage.removeItem('gbc_logged_in_user');
+    checkUserAuth();
+}
+
+function checkUserAuth() {
+    const loggedUser = sessionStorage.getItem('gbc_logged_in_user');
+    const authScreen = document.getElementById('authScreen');
     const panelScreen = document.getElementById('panelScreen');
     const logoutBtn = document.getElementById('logoutBtn');
+    const welcomeBanner = document.getElementById('welcomeUserBanner');
 
-    if (isAuthed) {
-        if(loginScreen) loginScreen.style.display = 'none';
+    if (loggedUser) {
+        if(authScreen) authScreen.style.display = 'none';
         if(panelScreen) panelScreen.style.display = 'block';
         if(logoutBtn) logoutBtn.style.display = 'block';
+        if(welcomeBanner) welcomeBanner.innerText = `Logged in as: ${loggedUser}`;
     } else {
-        if(loginScreen) loginScreen.style.display = 'block';
+        if(authScreen) authScreen.style.display = 'block';
         if(panelScreen) panelScreen.style.display = 'none';
         if(logoutBtn) logoutBtn.style.display = 'none';
     }
 }
 
-function handleStaffLogin(e) {
-    e.preventDefault();
-    const user = document.getElementById('staffUser').value;
-    const pass = document.getElementById('staffPass').value;
+// Toggle between URL input or Device File upload in panel
+function switchImgInput(mode) {
+    const urlBox = document.getElementById('urlInputBox');
+    const fileBox = document.getElementById('fileInputBox');
+    const btnUrl = document.getElementById('imgTabUrl');
+    const btnFile = document.getElementById('imgTabFile');
 
-    // Simple secure check (Change username/password here as desired)
-    if (user === 'admin' && pass === 'gbc2026admin') {
-        sessionStorage.setItem('gbc_staff_logged_in', 'true');
-        checkStaffAuth();
+    if (mode === 'url') {
+        urlBox.style.display = 'block';
+        fileBox.style.display = 'none';
+        btnUrl.classList.add('active');
+        btnFile.classList.remove('active');
     } else {
-        alert('Invalid credentials! Access denied.');
+        urlBox.style.display = 'none';
+        fileBox.style.display = 'block';
+        btnFile.classList.add('active');
+        btnUrl.classList.remove('active');
     }
 }
 
-function staffLogout() {
-    sessionStorage.removeItem('gbc_staff_logged_in');
-    checkStaffAuth();
-}
-
-// Handle item upload from authenticated panel with category selector
+// Handle Upload with support for local file reading or URL
 function handleItemUpload(event) {
     event.preventDefault();
     
     const category = document.getElementById('itemCategory').value;
-    const newItem = {
-        title: document.getElementById('itemTitle').value,
-        price: document.getElementById('itemPrice').value,
-        tag: document.getElementById('itemTag').value,
-        image: document.getElementById('itemImage').value,
-        desc: document.getElementById('itemDesc').value
-    };
+    const title = document.getElementById('itemTitle').value;
+    const price = document.getElementById('itemPrice').value;
+    const tag = document.getElementById('itemTag').value;
+    const desc = document.getElementById('itemDesc').value;
 
+    const fileInput = document.getElementById('itemFile');
+    const urlInput = document.getElementById('itemImage').value;
+
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            saveNewItem(category, { title, price, tag, desc, image: e.target.result });
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        saveNewItem(category, { title, price, tag, desc, image: urlInput });
+    }
+}
+
+function saveNewItem(category, newItem) {
     const data = getStoreData();
     if (!data[category]) data[category] = [];
     
