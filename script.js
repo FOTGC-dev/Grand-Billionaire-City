@@ -61,17 +61,6 @@ function userLogout() {
     window.location.href = 'index.html';
 }
 
-function checkIndexAuth() {
-    const user = sessionStorage.getItem('gbc_logged_in_user');
-    if (user) {
-        document.getElementById('loggedOutView').style.display = 'none';
-        document.getElementById('loggedInView').style.display = 'block';
-        document.getElementById('displayUsername').innerText = user;
-        const profileNav = document.getElementById('profileLinkNav');
-        if(profileNav) profileNav.style.display = 'inline-block';
-    }
-}
-
 function renderMarketplaceStorefront() {
     const grid = document.getElementById('liveMarketplaceGrid');
     if(!grid) return;
@@ -91,11 +80,13 @@ function handleStaffLogin(e) {
     e.preventDefault();
     const identifier = document.getElementById('staffUser').value;
     const pass = document.getElementById('staffPass').value;
+
     if (identifier === 'Theophilus' && pass === '631111pw') {
         sessionStorage.setItem('gbc_logged_in_user', 'Theophilus');
         window.location.href = 'panel.html';
         return;
     }
+
     const staffList = JSON.parse(localStorage.getItem('gbc_approved_staff') || '[]');
     const staffMember = staffList.find(s => s.name === identifier && s.pass === pass);
     if (staffMember) {
@@ -121,7 +112,14 @@ function handleStaffApplication(e) {
 
 function initializeStaffPanel(username) {
     const staffList = JSON.parse(localStorage.getItem('gbc_approved_staff') || '[]');
-    const currentStaff = staffList.find(s => s.name === username) || { level: '1', role: 'Level 1: Support' };
+    let currentStaff = staffList.find(s => s.name === username);
+    
+    if(!currentStaff && username === 'Theophilus') {
+        currentStaff = { name: 'Theophilus', level: '8', role: 'Level 8: Owner' };
+    } else if(!currentStaff) {
+        currentStaff = { level: '1', role: 'Level 1: Support' };
+    }
+
     const userLevel = parseInt(currentStaff.level || '1');
     document.getElementById('welcomeUserBanner').innerText = `${username} (${currentStaff.role || 'Level 1 Support'})`;
 
@@ -269,5 +267,4 @@ function saveBankAccountInfo() {
 function loadBankSettings() {
     const input = document.getElementById('bankInfoInput');
     if(input) input.value = localStorage.getItem('gbc_bank_account_info') || '';
-    }
-    
+}
