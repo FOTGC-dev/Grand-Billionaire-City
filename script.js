@@ -121,7 +121,7 @@ function toggleCartDrawer() {
     if(drawer) drawer.classList.toggle('open');
 }
 
-// Enhanced WhatsApp Checkout Invoice System
+// Structured WhatsApp Checkout Invoice
 function checkoutCartWhatsApp() {
     const cart = getCart();
     if (cart.length === 0) {
@@ -133,15 +133,13 @@ function checkoutCartWhatsApp() {
     const loggedUser = sessionStorage.getItem('gbc_logged_in_user') || 'Guest Player';
     let itemsText = cart.map(i => `• ${i.title} [${i.price}]`).join('\n');
     
-    // Save to order logs for admin panel
     const orders = JSON.parse(localStorage.getItem('gbc_order_logs') || '[]');
-    orders.unshift({ orderId, user: loggedUser, items: cart, date: new Date().toLocaleTimeString() });
+    orders.unshift({ orderId, user: loggedUser, items: cart, date: new Date().toLocaleString() });
     localStorage.setItem('gbc_order_logs', JSON.stringify(orders));
 
-    const message = `🛒 *GRAND BILLIONAIRE CITY - INVOICE* 🛒\n\n🆔 *Order ID:* ${orderId}\n👤 *Customer:* ${loggedUser}\n\n*Ordered Items:*\n${itemsText}\n\n📌 Please verify payment and dispatch items in-game!`;
+    const message = `🛒 *GRAND BILLIONAIRE CITY - ORDER INVOICE* 🛒\n\n🆔 *Order ID:* ${orderId}\n👤 *Customer:* ${loggedUser}\n\n*Items Ordered:*\n${itemsText}\n\n📌 Please verify payment and dispatch items in-game!`;
     const encoded = encodeURIComponent(message);
     
-    // Clear cart after checkout trigger
     localStorage.removeItem('gbc_cart_items');
     updateCartUI();
     toggleCartDrawer();
@@ -149,17 +147,41 @@ function checkoutCartWhatsApp() {
     window.open(`https://wa.me/2348000000000?text=${encoded}`, '_blank');
 }
 
-// Live Chat Support Widget Logic
+// User Profile Order Ledger
+function loadUserOrderHistory(username) {
+    const container = document.getElementById('userOrderHistory');
+    if(!container) return;
+
+    const orders = JSON.parse(localStorage.getItem('gbc_order_logs') || '[]').filter(o => o.user === username);
+    if (orders.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">You have no checkout history yet.</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    orders.forEach(ord => {
+        const box = document.createElement('div');
+        box.style.background = '#0a0a0a';
+        box.style.border = '1px solid var(--card-border)';
+        box.style.padding = '12px';
+        box.style.borderRadius = '8px';
+        box.style.fontSize = '0.85rem';
+
+        let itemsSummary = ord.items.map(i => `${i.title} (${i.price})`).join(', ');
+        box.innerHTML = `<strong>Order ID:</strong> ${ord.orderId} <span style="float: right; color: var(--text-muted);">${ord.date}</span><br><span style="color: var(--accent-gold);">Items:</span> ${itemsSummary}`;
+        container.appendChild(box);
+    });
+}
+
+// Live Chat Support
 function toggleSupportChat() {
     const box = document.getElementById('supportChatBox');
-    if(box) {
-        box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-    }
+    if(box) box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
 }
 
 function getChatMessages() {
     const saved = localStorage.getItem('gbc_live_chat_history');
-    return saved ? JSON.parse(saved) : [{ sender: 'admin', text: 'Hello! How can we assist you with your Grand Billionaire City order today?' }];
+    return saved ? JSON.parse(saved) : [{ sender: 'admin', text: 'Hello! How can we assist you with your order today?' }];
 }
 
 function sendUserChatMessage() {
@@ -192,15 +214,7 @@ function renderChatBox() {
     body.scrollTop = body.scrollHeight;
 }
 
-// Admin Panel Tab Switching & Features
-function switchPanelTab(tabName, btnEl) {
-    document.querySelectorAll('.panel-section').forEach(sec => sec.style.display = 'none');
-    document.querySelectorAll('.tab-selector .tab-btn').forEach(btn => btn.classList.remove('active'));
-
-    document.getElementById(`panelTab-${tabName}`).style.display = 'block';
-    if(btnEl) btnEl.classList.add('active');
-}
-
+// Admin Support Panel
 function loadAdminChatSession() {
     const log = document.getElementById('adminChatLog');
     if(!log) return;
@@ -256,7 +270,15 @@ function loadOrderLogs() {
     });
 }
 
-// Authentication & Panel Routing
+function switchPanelTab(tabName, btnEl) {
+    document.querySelectorAll('.panel-section').forEach(sec => sec.style.display = 'none');
+    document.querySelectorAll('.tab-selector .tab-btn').forEach(btn => btn.classList.remove('active'));
+
+    document.getElementById(`panelTab-${tabName}`).style.display = 'block';
+    if(btnEl) btnEl.classList.add('active');
+}
+
+// Authentication Routing
 function switchAuthTab(tab) {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -292,7 +314,7 @@ function handleUserRegister(e) {
     localStorage.setItem('gbc_registered_users', JSON.stringify(users));
     sessionStorage.setItem('gbc_logged_in_user', username);
     alert('Account created successfully!');
-    checkUserAuth();
+    checkIndexAuth();
 }
 
 function handleUserLogin(e) {
@@ -302,7 +324,7 @@ function handleUserLogin(e) {
 
     if (identifier === 'admin' && pass === 'gbc2026admin') {
         sessionStorage.setItem('gbc_logged_in_user', 'Administrator');
-        checkUserAuth();
+        window.location.href = 'panel.html';
         return;
     }
 
@@ -311,7 +333,7 @@ function handleUserLogin(e) {
 
     if (found) {
         sessionStorage.setItem('gbc_logged_in_user', found.username);
-        checkUserAuth();
+        window.location.href = 'profile.html';
     } else {
         alert('Invalid credentials!');
     }
@@ -319,44 +341,27 @@ function handleUserLogin(e) {
 
 function userLogout() {
     sessionStorage.removeItem('gbc_logged_in_user');
-    checkUserAuth();
+    window.location.href = 'index.html';
 }
 
-function checkUserAuth() {
+function checkIndexAuth() {
     const loggedUser = sessionStorage.getItem('gbc_logged_in_user');
-    const authScreen = document.getElementById('authScreen');
-    const panelScreen = document.getElementById('panelScreen');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const welcomeBanner = document.getElementById('welcomeUserBanner');
+    const loggedInView = document.getElementById('loggedInView');
+    const loggedOutView = document.getElementById('loggedOutView');
+    const displayUsername = document.getElementById('displayUsername');
+    const profileNav = document.getElementById('profileLinkNav');
+
+    if (!loggedInView || !loggedOutView) return;
 
     if (loggedUser) {
-        if(authScreen) authScreen.style.display = 'none';
-        if(panelScreen) panelScreen.style.display = 'block';
-        if(logoutBtn) logoutBtn.style.display = 'block';
-        if(welcomeBanner) welcomeBanner.innerText = `Logged in: ${loggedUser}`;
+        loggedInView.style.display = 'block';
+        loggedOutView.style.display = 'none';
+        if (displayUsername) displayUsername.innerText = loggedUser;
+        if (profileNav) profileNav.style.display = 'inline-flex';
     } else {
-        if(authScreen) authScreen.style.display = 'block';
-        if(panelScreen) panelScreen.style.display = 'none';
-        if(logoutBtn) logoutBtn.style.display = 'none';
-    }
-}
-
-function switchImgInput(mode) {
-    const urlBox = document.getElementById('urlInputBox');
-    const fileBox = document.getElementById('fileInputBox');
-    const btnUrl = document.getElementById('imgTabUrl');
-    const btnFile = document.getElementById('imgTabFile');
-
-    if (mode === 'url') {
-        urlBox.style.display = 'block';
-        fileBox.style.display = 'none';
-        btnUrl.classList.add('active');
-        btnFile.classList.remove('active');
-    } else {
-        urlBox.style.display = 'none';
-        fileBox.style.display = 'block';
-        btnFile.classList.add('active');
-        btnUrl.classList.remove('active');
+        loggedInView.style.display = 'none';
+        loggedOutView.style.display = 'block';
+        if (profileNav) profileNav.style.display = 'none';
     }
 }
 
@@ -367,64 +372,13 @@ function handleItemUpload(event) {
     const price = document.getElementById('itemPrice').value;
     const tag = document.getElementById('itemTag').value;
     const desc = document.getElementById('itemDesc').value;
+    const image = document.getElementById('itemImage').value;
 
-    const fileInput = document.getElementById('itemFile');
-    const urlInput = document.getElementById('itemImage').value;
-
-    if (fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            saveNewItem(category, { title, price, tag, desc, image: e.target.result });
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-    } else {
-        saveNewItem(category, { title, price, tag, desc, image: urlInput });
-    }
-}
-
-function saveNewItem(category, newItem) {
     const data = getStoreData();
     if (!data[category]) data[category] = [];
-    data[category].unshift(newItem);
+    data[category].unshift({ title, price, tag, desc, image });
     localStorage.setItem('gbc_store_data_categorized', JSON.stringify(data));
-    alert('Item successfully published to marketplace category!');
+    alert('Item successfully published!');
     document.getElementById('uploadForm').reset();
-                 }
-            
-// Homepage Authentication State Check
-function checkIndexAuth() {
-    const loggedUser = sessionStorage.getItem('gbc_logged_in_user');
-    const loggedInView = document.getElementById('loggedInView');
-    const loggedOutView = document.getElementById('loggedOutView');
-    const displayUsername = document.getElementById('displayUsername');
-
-    if (!loggedInView || !loggedOutView) return;
-
-    if (loggedUser) {
-        loggedInView.style.display = 'block';
-        loggedOutView.style.display = 'none';
-        if (displayUsername) displayUsername.innerText = loggedUser;
-    } else {
-        loggedInView.style.display = 'none';
-        loggedOutView.style.display = 'block';
     }
-}
-
-// Override or extend login handlers to support homepage redirection state updates
-const originalHandleUserLogin = handleUserLogin;
-handleUserLogin = function(e) {
-    originalHandleUserLogin(e);
-    if(typeof checkIndexAuth === 'function') checkIndexAuth();
-};
-
-const originalHandleUserRegister = handleUserRegister;
-handleUserRegister = function(e) {
-    originalHandleUserRegister(e);
-    if(typeof checkIndexAuth === 'function') checkIndexAuth();
-};
-
-const originalUserLogout = userLogout;
-userLogout = function() {
-    originalUserLogout();
-    if(typeof checkIndexAuth === 'function') checkIndexAuth();
-};
+        
