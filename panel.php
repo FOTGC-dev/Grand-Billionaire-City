@@ -35,7 +35,15 @@
         <div class="panel-section" id="panelTab-support">
             <div class="admin-form-container" style="max-width: 100%;">
                 <h3>Live Customer Support Desk</h3>
-                <div id="adminChatLog" style="height: 300px; background: #0a0a0a; border: 1px solid var(--card-border); border-radius: 8px; padding: 15px; overflow-y: auto; margin-bottom: 15px;"></div>
+                <div id="adminChatLog" style="height: 300px; background: #0a0a0a; border: 1px solid var(--card-border); border-radius: 8px; padding: 15px; overflow-y: auto; margin-bottom: 15px; color: var(--text-muted);">Support queues active.</div>
+            </div>
+        </div>
+
+        <!-- Orders (Level 2+) -->
+        <div class="panel-section" id="panelTab-orders" style="display: none;">
+            <div class="admin-form-container" style="max-width: 100%;">
+                <h3>Global Order Logs</h3>
+                <div id="orderLogsContainer" style="color: var(--text-muted); margin-top: 10px;">No current order logs found.</div>
             </div>
         </div>
 
@@ -128,5 +136,4 @@
         };
     </script>
 </body>
-    </html>
-    
+</html>
