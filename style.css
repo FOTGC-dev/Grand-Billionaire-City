@@ -24,7 +24,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Navigation */
 nav {
     display: flex;
     justify-content: space-between;
@@ -115,14 +114,12 @@ nav {
     margin-left: 4px;
 }
 
-/* Page Setup */
 .page-view {
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* Hero Section */
 .hero {
     position: relative;
     border-radius: 16px;
@@ -150,7 +147,6 @@ nav {
     font-size: 0.95rem;
 }
 
-/* Grid & Cards */
 .section-title {
     font-size: 1.25rem;
     font-weight: 800;
@@ -232,7 +228,6 @@ nav {
     color: #fff;
 }
 
-/* Forms & Containers */
 .admin-form-container {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -273,6 +268,7 @@ nav {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
 .tab-btn {
@@ -280,11 +276,12 @@ nav {
     background: #0a0a0a;
     border: 1px solid var(--card-border);
     color: var(--text-muted);
-    padding: 8px;
+    padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     font-size: 0.8rem;
+    min-width: 120px;
 }
 
 .tab-btn.active {
@@ -293,7 +290,6 @@ nav {
     border-color: var(--accent-gold);
 }
 
-/* Cart Modal Drawer */
 .cart-modal {
     position: fixed;
     top: 0;
@@ -341,7 +337,6 @@ nav {
     font-size: 0.85rem;
 }
 
-/* Live Support Widget */
 .support-widget-btn {
     position: fixed;
     bottom: 25px;
