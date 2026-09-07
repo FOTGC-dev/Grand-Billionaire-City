@@ -81,6 +81,11 @@ nav {
     border: 1px solid var(--card-border);
 }
 
+.btn-cart {
+    background: var(--accent-red);
+    color: white;
+}
+
 /* Page Containers */
 .page-view {
     padding: 20px;
@@ -148,6 +153,9 @@ nav {
     font-weight: 800;
     margin-bottom: 20px;
     letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .grid-cards {
@@ -216,12 +224,26 @@ nav {
     text-decoration: none;
 }
 
+.btn-whatsapp {
+    background: #25d366;
+    color: #fff;
+}
+
 .btn-danger {
     background: var(--accent-red);
     color: #fff;
 }
 
-/* Form Styles for Admin Panel */
+/* Info Banner Box */
+.info-banner {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+/* Forms */
 .admin-form-container {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
