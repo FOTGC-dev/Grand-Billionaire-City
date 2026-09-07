@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBC Coin Official Store</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+<div class="container nav">
+ <a class="brand" href="index.html"><div class="logo">GBC</div><div><h1>GRAND BILLIONAIRE CITY</h1><small>GC COIN OFFICIAL • GLOBAL STORE • EST 2022</small></div></a>
+ <div class="actions"><a class="btn dark" href="#">🔒 STAFF</a><button class="btn red" onclick="showCart()">🛒 CART <span id="cartCount">0</span></button></div>
+</div>
+</header>
+
+<main>
+<section class="container store-hero">
+ <div class="hero-content">
+  <div class="kicker">🔒 ORDER ID PROTECTED • RATE LIMITED • CAPTCHA 3+4</div>
+  <div class="kicker">✓ VERIFIED OFFICIAL • GC COIN PAYMENTS</div>
+  <h2>GRAND BILLIONAIRE CITY<br><span style="color:#e6bd31">GC COIN OFFICIAL STORE</span></h2>
+  <p>Official vehicle and property store. Pricing in GC Coin. Rate: 1 GC = 400 NGN = $0.27. Global payments accepted. Instant delivery.</p>
+  <div class="actions"><a class="btn gold" href="#coins">BUY GC COIN</a><a class="btn red" href="#vehicles">VIEW VEHICLES</a><button class="btn dark" onclick="showCart()">CART • <span id="heroCart">0</span> GC</button></div>
+ </div>
+</section>
+
+<section class="container section" style="padding-bottom:20px">
+ <div class="stats">
+  <div class="stat"><strong>15k+</strong><span>Players</span></div><div class="stat"><strong>50k+</strong><span>Orders</span></div>
+  <div class="stat"><strong>4.9</strong><span>Rating</span></div><div class="stat"><strong>Global</strong><span>Coverage</span></div>
+ </div>
+ <div class="payments"><b>▣ PAYMENT METHODS</b><span class="pay">PayPal</span><span class="pay">Credit Card</span><span class="pay">Crypto BTC / USDT</span><span class="pay">Bank Transfer</span><span class="pay">Apple Pay</span><span class="pay">Google Pay</span><span class="pay active">GC COIN</span><span style="font-size:10px;color:#666">Worldwide • No region lock</span></div>
+</section>
+
+<section id="coins" class="section">
+<div class="container">
+ <div class="rate"><strong>🪙 GC COIN SHOP — Official Game Currency</strong><div><span>RATE: 1 GC = 400 NGN</span> <span>1 GC = $0.27 USD</span></div></div>
+ <div class="section-head"><div class="eyebrow">CURRENCY</div><h2>BUY GC COIN</h2><p>Select amount. Rate fixed: 1 GC = 400 NGN = $0.27. Instant delivery.</p></div>
+ <div class="coin-grid" id="coinGrid"></div>
+</div>
+</section>
+
+<section id="vehicles" class="section" style="padding-top:30px">
+<div class="container">
+ <div class="section-head"><div class="eyebrow">INVENTORY</div><h2>Vehicle Collection</h2><p>14 units • Stock: 5 each • RPM Default • Pricing in GC Coin</p></div>
+ <div class="market-grid" id="vehicleGrid"></div>
+</div>
+</section>
+
+<section id="properties" class="section">
+<div class="container">
+ <div class="section-head"><div class="eyebrow">🏠 PROPERTY LISTINGS</div><h2>Properties</h2></div>
+ <div class="property-grid">
+  <div class="property"><h3>Vinewood Mansion</h3><span class="gc">17 GC</span><p>Hillside estate, pool access • Game: 38M • GTA Property</p><button class="btn dark" onclick="addItem('Vinewood Mansion',17)">ADD • 17 GC</button></div>
+  <div class="property"><h3>City Penthouse</h3><span class="gc">15 GC</span><p>High-rise suite, helipad included • Game: 32M</p><button class="btn dark" onclick="addItem('City Penthouse',15)">ADD • 15 GC</button></div>
+  <div class="property"><h3>Beach Villa</h3><span class="gc">13 GC</span><p>Oceanfront, private dock • Game: 28M</p><button class="btn dark" onclick="addItem('Beach Villa',13)">ADD • 13 GC</button></div>
+ </div>
+</div>
+</section>
+
+<section class="section">
+<div class="container">
+ <div class="section-head"><div class="eyebrow">👑 DONATOR TIERS</div><h2>Donator Packages</h2></div>
+ <div class="donor-grid">
+  <div class="donor"><h3>Bronze Donator</h3><div class="amount">5 GC</div><ul><li>50M Cash</li><li>Bronze Tag</li><li>1 Car Slot</li></ul><button class="btn gold" onclick="addItem('Bronze Donator',5)">BUY • 5 GC</button></div>
+  <div class="donor"><h3>Gold Donator</h3><div class="amount">13 GC</div><ul><li>200M Cash</li><li>Gold Tag</li><li>3 Car Slots</li><li>Custom Profile</li></ul><button class="btn gold" onclick="addItem('Gold Donator',13)">BUY • 13 GC</button></div>
+  <div class="donor"><h3>Diamond Donator</h3><div class="amount">20 GC</div><ul><li>500M Cash</li><li>Diamond Tag</li><li>5 Car Slots</li><li>Mansion Discount</li></ul><button class="btn gold" onclick="addItem('Diamond Donator',20)">BUY • 20 GC</button></div>
+  <div class="donor"><h3>Platinum Donator</h3><div class="amount">30 GC</div><ul><li>1B Cash</li><li>Platinum Tag</li><li>Unlimited Slots</li><li>Priority Support</li></ul><button class="btn gold" onclick="addItem('Platinum Donator',30)">BUY • 30 GC</button></div>
+ </div>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="container">
+ <div class="footer-grid">
+  <div><div class="brand"><div class="logo">GBC</div><div><h1>GRAND BILLIONAIRE CITY</h1><small>OFFICIAL STORE</small></div></div><p>Official GC Coin, vehicles and properties store. Global payments accepted.</p></div>
+  <div><h4>CONTACT</h4><p>grandbillionairecity@gmail.com</p><p>Support 24/7 via WhatsApp and Email.</p></div>
+  <div><h4>DELIVERY</h4><p>Orders processed instantly. Details encoded and delivered in-game.</p></div>
+  <div><h4>LINKS</h4><a href="index.html">Home ↗</a><a href="#vehicles">Vehicles ↗</a><a href="#properties">Properties ↗</a></div>
+ </div>
+ <div class="copy">© 2026 GRAND BILLIONAIRE CITY • GC COIN OFFICIAL STORE • All Rights Reserved.</div>
+</div>
+</footer>
+
+<a class="float-support" href="mailto:grandbillionairecity@gmail.com">💬 SUPPORT</a>
+
+<script>
+const coins=[1,5,10,25,50,100,250,500,1000];
+const vehicles=[
+ ['Porsche 911 Turbo S White',34,'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1000&q=80'],
+ ['Bugatti Chiron Super Sport',63,'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1000&q=80'],
+ ['Lamborghini Revuelto',54,'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=1000&q=80'],
+ ['Rolls Royce Cullinan White',50,'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1000&q=80'],
+ ['Cadillac Escalade',30,'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1000&q=80'],
+ ['G-Wagon G63',41,'https://images.unsplash.com/photo-1520031441872-265e4ff70366?auto=format&fit=crop&w=1000&q=80'],
+ ['Tesla Cybertruck',36,'https://images.unsplash.com/photo-1731480089723-0a9f6db2a4c9?auto=format&fit=crop&w=1000&q=80'],
+ ['Huracan STO Lime',43,'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1000&q=80'],
+ ['Mustang Shelby GT500',25,'https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?auto=format&fit=crop&w=1000&q=80'],
+ ['BMW M4 Competition',23,'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1000&q=80'],
+ ['Dodge Challenger Demon',27,'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=80'],
+ ['Corvette C8 Red',32,'https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1000&q=80'],
+ ['Rolls Royce Spectre White Glow',61,'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1000&q=80'],
+ ['McLaren P1 Orange',57,'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1000&q=80']
+];
+
+let cart=JSON.parse(localStorage.getItem('gbcCart')||'[]');
+function money(gc){return '$'+(gc*.27).toFixed(2)+' • ₦'+(gc*400).toLocaleString();}
+function renderCoins(){
+ document.getElementById('coinGrid').innerHTML=coins.map((gc,i)=>`
+ <article class="coin-card ${gc===5?'popular':''}">
+  ${gc===5?'<span style="position:absolute;right:14px;top:14px;background:#e5bd32;color:#111;padding:6px 9px;border-radius:999px;font-size:8px;font-weight:900">POPULAR</span>':''}
+  <div class="coin-icon">GC</div><h3>${gc} GC COIN</h3><div class="amount">${gc} GC</div><div class="price">${money(gc)}<br>Rate: 1 GC = 400 NGN</div>
+  <div class="card-actions"><button class="btn gold" onclick="addItem('${gc} GC Coin',${gc})">BUY</button><button class="btn dark mini" onclick="addItem('${gc} GC Coin',${gc})">CART</button></div>
+ </article>`).join('');
+}
+function renderVehicles(){
+ document.getElementById('vehicleGrid').innerHTML=vehicles.map(v=>`
+ <article class="market-card"><img src="${v[2]}" alt="${v[0]}" loading="lazy">
+ <div class="market-info"><div class="market-top"><h3>${v[0]}</h3><span class="gc">${v[1]} GC</span></div>
+ <div class="desc">Game Value • GTA pricing • 10% OFF applied • Stock: 5 • RPM Default</div>
+ <button class="btn red" style="width:100%" onclick="addItem('${v[0]}',${v[1]})">ADD TO CART • ${v[1]} GC</button></div></article>`).join('');
+}
+function addItem(name,gc){cart.push({name,gc});localStorage.setItem('gbcCart',JSON.stringify(cart));updateCart();alert(name+' added to cart.');}
+function updateCart(){
+ const total=cart.reduce((s,x)=>s+x.gc,0), count=cart.length;
+ document.getElementById('cartCount').textContent=count;
+ document.getElementById('heroCart').textContent=total;
+}
+function showCart(){
+ const total=cart.reduce((s,x)=>s+x.gc,0);
+ if(!cart.length){alert('Your GBC cart is empty.');return}
+ const list=cart.map((x,i)=>`${i+1}. ${x.name} — ${x.gc} GC`).join('\\n');
+ if(confirm(list+'\\n\\nTOTAL: '+total+' GC\\n\\nProceed to checkout?')) alert('Checkout ready. Connect your payment/backend here.');
+}
+renderCoins();renderVehicles();updateCart();
+</script>
+</body>
+</html>
