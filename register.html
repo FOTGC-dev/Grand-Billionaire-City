@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Account | GBC</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <header class="navbar">
+  <title>Create Account | Grand Billionaire City</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js" defer></script>
+</head>
+
+<body class="auth-page">
+
+  <header class="site-header">
     <a href="index.html" class="logo">
       <span>GBC</span>
       <small>GRAND BILLIONAIRE CITY</small>
     </a>
+
     <nav>
       <a href="index.html">Home</a>
       <a href="index.html#store">Store</a>
@@ -20,64 +27,91 @@
     </nav>
   </header>
 
-  <main class="auth-page">
-    <div class="auth-card">
-      <span class="eyebrow">JOIN GBC</span>
-      <h1>Create your account.</h1>
-      <p class="auth-subtitle">Start building your empire today.</p>
+  <main class="auth-container">
+    <section class="auth-card">
 
-      <div id="register-message" class="form-message" role="alert"></div>
+      <p class="eyebrow">JOIN GBC</p>
+
+      <h1>Create your account.</h1>
+
+      <p class="auth-subtitle">
+        Start building your empire today.
+      </p>
 
       <form id="register-form">
+
         <label for="register-username">Username</label>
+
         <input
-          id="register-username"
           type="text"
+          id="register-username"
+          name="username"
           placeholder="Choose a username"
-          required
           autocomplete="username"
-        >
+          required
+        />
 
         <label for="register-email">Email</label>
+
         <input
-          id="register-email"
           type="email"
+          id="register-email"
+          name="email"
           placeholder="Enter your email"
-          required
           autocomplete="email"
-        >
+          required
+        />
 
         <label for="register-password">Password</label>
-        <input
-          id="register-password"
-          type="password"
-          placeholder="Create a password"
-          required
-          minlength="6"
-          autocomplete="new-password"
-        >
 
-        <button type="submit" class="btn btn-primary auth-submit">
+        <input
+          type="password"
+          id="register-password"
+          name="password"
+          placeholder="Create a password"
+          autocomplete="new-password"
+          minlength="6"
+          required
+        />
+
+        <label for="register-confirm-password">
+          Confirm Password
+        </label>
+
+        <input
+          type="password"
+          id="register-confirm-password"
+          name="confirm-password"
+          placeholder="Repeat your password"
+          autocomplete="new-password"
+          minlength="6"
+          required
+        />
+
+        <button type="submit" class="primary-button">
           Create Account
         </button>
+
+        <p id="register-message" class="form-message"></p>
+
       </form>
 
       <p class="auth-footer">
         Already have an account?
         <a href="login.html">Log in</a>
       </p>
-    </div>
+
+    </section>
   </main>
 
-  <footer>
+  <footer class="site-footer">
     <div class="logo">
       <span>GBC</span>
       <small>GRAND BILLIONAIRE CITY</small>
     </div>
+
     <p>© 2026 Grand Billionaire City. All rights reserved.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js"></script>
 </body>
 </html>
