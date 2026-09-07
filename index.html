@@ -3,331 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Billionaire City - Official Hub & Marketplace</title>
-    <style>
-        /* Global Reset & Theme */
-        :root {
-            --bg-dark: #0a0a0a;
-            --card-bg: #141414;
-            --card-border: #222222;
-            --accent-gold: #f3ce54;
-            --accent-gold-gradient: linear-gradient(135deg, #f3ce54 0%, #d4af37 100%);
-            --accent-red: #ff3b30;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            line-height: 1.5;
-            overflow-x: hidden;
-        }
-
-        /* Navigation Bar */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            background: rgba(10, 10, 10, 0.95);
-            border-bottom: 1px solid var(--card-border);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-badge {
-            background: var(--accent-gold-gradient);
-            color: #000;
-            font-weight: 800;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
-
-        .brand-title {
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            font-size: 0.95rem;
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-nav {
-            background: var(--accent-gold);
-            color: #000;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            font-size: 0.85rem;
-            text-decoration: none;
-        }
-
-        .btn-nav-outline {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--card-border);
-        }
-
-        /* Tab Switcher for Demo Purposes */
-        .page-switcher {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            padding: 20px;
-            background: #111;
-        }
-
-        .tab-btn {
-            background: #222;
-            color: var(--text-muted);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .tab-btn.active {
-            background: var(--accent-gold);
-            color: #000;
-        }
-
-        /* Page Layout Containers */
-        .page-view {
-            display: none;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .page-view.active {
-            display: block;
-        }
-
-        /* Hero Section */
-        .hero {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--card-border);
-            margin-bottom: 30px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80') center/cover;
-            padding: 60px 30px;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            margin-bottom: 15px;
-            background: var(--accent-gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            color: #ccc;
-            max-width: 600px;
-            margin: 0 auto 25px auto;
-            font-size: 0.95rem;
-        }
-
-        .hero-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .stat-card {
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid var(--card-border);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            font-size: 1.2rem;
-            color: var(--accent-gold);
-        }
-
-        .stat-card p {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin: 0;
-        }
-
-        /* Grid Sections */
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-        }
-
-        .grid-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            border-color: #333;
-        }
-
-        .card-img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .card-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
-
-        .badge-tag {
-            display: inline-block;
-            background: rgba(243, 206, 84, 0.1);
-            color: var(--accent-gold);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            background: var(--accent-gold);
-            color: #000;
-            padding: 10px;
-            border-radius: 6px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            text-decoration: none;
-        }
-
-        .btn-danger {
-            background: var(--accent-red);
-            color: #fff;
-        }
-
-        /* Leaderboard / Table Style */
-        .ranking-list {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .rank-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .rank-item:last-child {
-            border-bottom: none;
-        }
-
-        .rank-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .rank-number {
-            font-weight: 800;
-            color: var(--accent-gold);
-            font-size: 1.1rem;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            border-top: 1px solid var(--card-border);
-            margin-top: 50px;
-        }
-    </style>
+    <title>Grand Billionaire City - Home</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Navigation Header -->
     <nav>
         <div class="nav-brand">
             <span class="brand-badge">GBC</span>
             <span class="brand-title">GRAND BILLIONAIRE CITY</span>
         </div>
         <div class="nav-actions">
-            <button class="btn-nav btn-nav-outline">FORBES</button>
-            <button class="btn-nav">JOIN</button>
+            <a href="panel.html" class="btn-nav btn-nav-outline">STAFF PANEL</a>
+            <a href="marketplace.html" class="btn-nav">MARKET</a>
         </div>
     </nav>
 
-    <!-- Interactive Page Toggle -->
-    <div class="page-switcher">
-        <button class="tab-btn active" onclick="switchPage('home')">Home Page</button>
-        <button class="tab-btn" onclick="switchPage('marketplace')">GC Coin Store / Marketplace</button>
-    </div>
-
-    <!-------------------------------- HOME PAGE -------------------------------->
-    <div id="home" class="page-view active">
+    <div class="page-view">
         <div class="hero">
             <span class="badge-tag">OFFICIAL STUDIO • EST. 2026 NIGERIA HUB</span>
             <h1>GRAND BILLIONAIRE CITY</h1>
             <p>A New Era of Roleplay - Official Mobile & PC. Realistic CRMP, open world, gangs, government, luxury life.</p>
-            <button class="btn-nav" style="display: inline-block; width: auto; padding: 12px 24px;">EXPLORE CITY →</button>
+            <a href="marketplace.html" class="btn-nav" style="display: inline-block; width: auto; padding: 12px 24px;">EXPLORE CITY →</a>
             
             <div class="hero-stats">
                 <div class="stat-card">
@@ -352,7 +49,7 @@
                     <span class="badge-tag">DISCORD</span>
                     <div class="card-title">Official Discord</div>
                     <div class="card-desc">5K+ members • Live announcements, support</div>
-                    <a href="#" class="btn-primary">Join Discord</a>
+                    <a href="https://discord.gg/grnd" target="_blank" class="btn-primary">Join Discord</a>
                 </div>
             </div>
             <div class="card">
@@ -366,99 +63,9 @@
         </div>
     </div>
 
-    <!-------------------------------- MARKETPLACE PAGE -------------------------------->
-    <div id="marketplace" class="page-view">
-        <div class="hero" style="background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=80') center/cover;">
-            <span class="badge-tag">GC COIN OFFICIAL • GLOBAL STORE</span>
-            <h1>GC COIN OFFICIAL STORE</h1>
-            <p>Official vehicle and property store. Pricing in GC Coin. Rate: 1 GC = 400 NGN = $0.27.</p>
-            <button class="btn-nav btn-danger" style="display: inline-block; width: auto; padding: 12px 24px;">CART • 0 GC</button>
-        </div>
-
-        <div class="section-title">VEHICLE COLLECTION</div>
-        <div class="grid-cards">
-            <!-- Vehicle Card 1 -->
-            <div class="card">
-                <img class="card-img" src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=600&q=80" alt="Supercar">
-                <div class="card-body">
-                    <span class="badge-tag">STOCK 5 • 10% OFF</span>
-                    <div class="card-title">Porsche 911 Turbo S</div>
-                    <div class="card-desc">Game Value: 75M • Ratio pricing applied</div>
-                    <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 12px;">34 GC</div>
-                    <button class="btn-primary btn-danger">ADD TO CART - 34 GC</button>
-                </div>
-            </div>
-
-            <!-- Vehicle Card 2 -->
-            <div class="card">
-                <img class="card-img" src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=600&q=80" alt="Supercar">
-                <div class="card-body">
-                    <span class="badge-tag">STOCK 5 • 10% OFF</span>
-                    <div class="card-title">Bugatti Chiron Super Sport</div>
-                    <div class="card-desc">Game Value: 140M • Ratio pricing applied</div>
-                    <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 12px;">63 GC</div>
-                    <button class="btn-primary btn-danger">ADD TO CART - 63 GC</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer>
         <p>© 2026 GRAND BILLIONAIRE CITY STUDIO | Nigeria Hub | All Rights Reserved</p>
     </footer>
 
-    <!-- Script to toggle views smoothly -->
-    <script>
-        function switchPage(pageId) {
-            document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(pageId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-    </script>
-</body>
-</html>
-<div class="container">
-  <div class="section-head"><div class="eyebrow">🏆 FORBES • LIVE OFFICIAL RANKING</div><h2>Grand Billionaire City<br><span style="color:#e5bd32">Forbes List</span></h2><p>Richest Players • Live Forbes Ranking</p></div>
-  <div class="rankings">
-    <div class="rank"><div class="ranknum">#1</div><div class="player">King_Adex<small>GBC Holdings</small></div><div class="money">$12.4B</div><div class="badge">ADEX EMPIRE</div></div>
-    <div class="rank"><div class="ranknum">#2</div><div class="player">Don_Billionaire<small>Luxury Motors</small></div><div class="money">$9.8B</div><div class="badge">BILLIONAIRE CARTEL</div></div>
-    <div class="rank"><div class="ranknum">#3</div><div class="player">Mayor_Leo<small>City Government</small></div><div class="money">$8.2B</div><div class="badge">GOVERNMENT</div></div>
-    <div class="rank"><div class="ranknum">#4</div><div class="player">Queen_Sarah<small>Fashion Empire</small></div><div class="money">$6.7B</div><div class="badge">ROYAL FAMILY</div></div>
-    <div class="rank"><div class="ranknum">#5</div><div class="player">Chief_Musa<small>Oil & Gas RP</small></div><div class="money">$5.9B</div><div class="badge">MUSA CLAN</div></div>
-  </div>
-</div>
-</section>
-
-<section id="contact" class="section">
-<div class="container">
- <div class="section-head"><div class="eyebrow">CONTACT • OFFICIAL STUDIO</div><h2>Get in<br>touch.</h2></div>
- <div class="contact">
-  <b>CONTACT STUDIO</b><p style="color:#777;font-size:12px;margin-top:6px">Direct message to studio — 24h response.</p>
-  <form class="form" onsubmit="event.preventDefault(); alert('Message ready to send to the GBC studio.');">
-    <input class="field" placeholder="Your RP name" required>
-    <input class="field" type="email" placeholder="your@email.com" required>
-    <textarea class="field" placeholder="Tell us about your RP, issue, or partnership..." required></textarea>
-    <button class="btn gold">SEND MESSAGE TO STUDIO →</button>
-  </form>
- </div>
-</div>
-</section>
-</main>
-
-<footer>
-<div class="container">
- <div class="footer-grid">
-  <div><div class="brand"><div class="logo">GBC</div><div><h1>GRAND BILLIONAIRE CITY</h1><small>OFFICIAL STUDIO</small></div></div><p>Official website for Grand Billionaire City RP / Mobile. Live the billionaire life.</p></div>
-  <div><h4>STUDIO</h4><a href="#city">The City</a><a href="#forbes">Forbes</a><a href="#contact">Contact</a></div>
-  <div><h4>MARKET</h4><a href="marketplace.html">GC Coin</a><a href="marketplace.html#vehicles">Vehicles</a><a href="marketplace.html#properties">Properties</a></div>
-  <div><h4>LINKS</h4><a href="#">Discord ↗</a><a href="#">Telegram ↗</a><a href="marketplace.html">Official Market ↗</a></div>
- </div>
- <div class="copy">© 2026 GRAND BILLIONAIRE CITY STUDIO • Nigeria • Official • All Rights Reserved.</div>
-</div>
-</footer>
-<a class="float-support" href="#contact">SUPPORT 💬</a>
 </body>
 </html>
