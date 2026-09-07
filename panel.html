@@ -55,6 +55,13 @@
         </div>
     </div>
     <script src="script.js"></script>
-    <script>window.onload = () => { const user = sessionStorage.getItem('gbc_logged_in_user'); if(!user) { window.location.href = 'staff-login.html'; return; } initializeStaffPanel(user); };</script>
+    <script>
+        window.onload = () => {
+            const user = sessionStorage.getItem('gbc_logged_in_user');
+            if(!user) { window.location.href = 'staff-login.html'; return; }
+            initializeStaffPanel(user);
+        };
+    </script>
 </body>
-</html>
+                                                                                   </html>
+                                                                                                                                                                       
