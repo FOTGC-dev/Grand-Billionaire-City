@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="page-view" style="max-width: 500px; margin-top: 60px;">
+    <div class="page-view" style="max-width: 450px; margin-top: 60px;">
         <div class="admin-form-container">
             <h3 style="color: var(--accent-gold); margin-bottom: 15px; text-align: center;">🛡️ Staff Portal Access</h3>
             <div class="tab-selector" style="margin-bottom: 20px;">
@@ -16,8 +16,8 @@
             </div>
             <form id="staffLoginForm" onsubmit="handleStaffLogin(event)">
                 <div class="form-group"><label>Staff Handle</label><input type="text" id="staffUser" required placeholder="Theophilus"></div>
-                <div class="form-group"><label>Password</label><input type="password" id="staffPass" required></div>
-                <button type="submit" class="btn-primary">ACCESS PANEL</button>
+                <div class="form-group"><label>Password</label><input type="password" id="staffPass" required placeholder="••••••••"></div>
+                <button type="submit" class="btn-primary">ACCESS ADMIN PANEL</button>
             </form>
             <form id="staffApplyForm" style="display: none;" onsubmit="handleStaffApplication(event)">
                 <div class="form-group"><label>Staff Handle</label><input type="text" id="appUser" required></div>
