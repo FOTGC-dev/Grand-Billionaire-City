@@ -11,36 +11,60 @@
     <nav>
         <div class="nav-brand">
             <span class="brand-badge">GBC</span>
-            <span class="brand-title">STAFF BACK-OFFICE</span>
+            <span class="brand-title">STAFF PORTAL</span>
         </div>
         <div class="nav-actions">
             <a href="index.html" class="btn-nav btn-nav-outline">HOME</a>
             <a href="marketplace.html" class="btn-nav btn-nav-outline">STORE</a>
-            <button id="logoutBtn" class="btn-nav btn-danger" style="display: none;" onclick="staffLogout()">LOGOUT</button>
+            <button id="logoutBtn" class="btn-nav btn-danger" style="display: none;" onclick="userLogout()">LOGOUT</button>
         </div>
     </nav>
 
     <div class="page-view">
-        <!-- LOGIN SCREEN (Visible by default if not authenticated) -->
-        <div id="loginScreen" class="admin-form-container" style="margin-top: 60px;">
-            <div class="section-title" style="text-align: center; justify-content: center; margin-bottom: 10px;">STAFF LOGIN</div>
-            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Enter administrative credentials to access item management panel.</p>
-            <form onsubmit="handleStaffLogin(event)">
+        <!-- AUTH SCREEN (Register or Login) -->
+        <div id="authScreen" class="admin-form-container" style="margin-top: 40px;">
+            <div class="tab-selector">
+                <button id="tabLoginBtn" class="tab-btn active" onclick="switchAuthTab('login')">LOG IN</button>
+                <button id="tabRegisterBtn" class="tab-btn" onclick="switchAuthTab('register')">REGISTER ACCOUNT</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleUserLogin(event)">
+                <div class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Staff Sign In</div>
                 <div class="form-group">
-                    <label>Staff Username</label>
-                    <input type="text" id="staffUser" placeholder="admin" required>
+                    <label>Username / Email</label>
+                    <input type="text" id="loginUser" placeholder="Enter username" required>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="staffPass" placeholder="••••••••" required>
+                    <input type="password" id="loginPass" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 14px;">AUTHENTICATE</button>
+                <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 12px;">LOG IN</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display: none;" onsubmit="handleUserRegister(event)">
+                <div class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Create Staff Account</div>
+                <div class="form-group">
+                    <label>Choose Username</label>
+                    <input type="text" id="regUser" placeholder="Choose username" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Create Password</label>
+                    <input type="password" id="regPass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="background: var(--accent-gold); padding: 12px;">REGISTER & LOGIN</button>
             </form>
         </div>
 
-        <!-- UPLOAD PANEL SCREEN (Hidden until logged in) -->
+        <!-- UPLOAD PANEL SCREEN (Unlocked upon login) -->
         <div id="panelScreen" style="display: none;">
-            <div class="section-title" style="text-align: center; justify-content: center;">UPLOAD NEW ITEM TO CATEGORY</div>
+            <div id="welcomeUserBanner" style="text-align: center; margin-bottom: 25px; color: var(--accent-gold); font-weight: 700;"></div>
+            <div class="section-title" style="text-align: center; justify-content: center;">UPLOAD ITEM TO MARKETPLACE</div>
             <div class="admin-form-container">
                 <form id="uploadForm" onsubmit="handleItemUpload(event)">
                     <div class="form-group">
@@ -65,10 +89,22 @@
                         <label for="itemTag">Badge / Stock Tag</label>
                         <input type="text" id="itemTag" placeholder="e.g. STOCK 5 • 10% OFF" required>
                     </div>
+
+                    <!-- IMAGE INPUT METHOD TOGGLE (URL OR FILE UPLOAD) -->
                     <div class="form-group">
-                        <label for="itemImage">Image URL (Optional for Coins/Tiers)</label>
-                        <input type="url" id="itemImage" placeholder="https://images.unsplash.com/...">
+                        <label>Item Image Source</label>
+                        <div class="tab-selector">
+                            <button type="button" id="imgTabUrl" class="tab-btn active" onclick="switchImgInput('url')">Paste Image URL</button>
+                            <button type="button" id="imgTabFile" class="tab-btn" onclick="switchImgInput('file')">Upload from Device</button>
+                        </div>
+                        <div id="urlInputBox">
+                            <input type="url" id="itemImage" placeholder="https://images.unsplash.com/...">
+                        </div>
+                        <div id="fileInputBox" style="display: none;">
+                            <input type="file" id="itemFile" accept="image/*">
+                        </div>
                     </div>
+
                     <div class="form-group">
                         <label for="itemDesc">Description / Perks / Real-world equivalent</label>
                         <textarea id="itemDesc" rows="3" placeholder="Game Value: 75M • $1.35 • ₦2,000" required></textarea>
@@ -86,7 +122,7 @@
     <script src="script.js"></script>
     <script>
         window.onload = () => {
-            checkStaffAuth();
+            checkUserAuth();
         };
     </script>
 </body>
