@@ -1,7 +1,3 @@
-// ============================================================
-// GRAND BILLIONAIRE CITY — SHARED FRONTEND SCRIPT
-// ============================================================
-
 const SUPABASE_URL =
   "https://blmpsybqewgbvmqjajmc.supabase.co";
 
@@ -14,7 +10,7 @@ const supabaseClient = supabase.createClient(
 );
 
 
-// ---------- SAFE DOM HELPERS ----------
+// ---------- HELPERS ----------
 
 function createText(tag, text, className = "") {
   const element = document.createElement(tag);
@@ -32,6 +28,18 @@ function showMessage(element, message, type) {
 
   element.textContent = message;
   element.className = `form-message show ${type}`;
+}
+
+async function getCurrentSession() {
+  const { data, error } =
+    await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error("Session error:", error);
+    return null;
+  }
+
+  return data.session;
 }
 
 
@@ -119,7 +127,7 @@ async function loadStore() {
       "btn btn-primary"
     );
 
-    button.href = "login.html";
+    button.href = "purchase.html";
 
     const priceRow = document.createElement("div");
     priceRow.className = "store-price";
@@ -136,21 +144,6 @@ async function loadStore() {
 
     grid.appendChild(card);
   });
-}
-
-
-// ---------- SESSION ----------
-
-async function getCurrentSession() {
-  const { data, error } =
-    await supabaseClient.auth.getSession();
-
-  if (error) {
-    console.error("Session error:", error);
-    return null;
-  }
-
-  return data.session;
 }
 
 
@@ -568,6 +561,226 @@ async function uploadReceipt(order, input, button) {
 }
 
 
+// ---------- PURCHASE ----------
+
+let purchaseItems = [];
+
+async function loadPurchaseItems() {
+  const select = document.getElementById("purchase-item");
+
+  if (!select) return;
+
+  const { data, error } = await supabaseClient
+    .from("store_items")
+    .select("id, title, price, description")
+    .eq("active", true)
+    .order("id");
+
+  if (error) {
+    console.error("Purchase items error:", error);
+
+    select.replaceChildren(
+      createText(
+        "option",
+        "Unable to load items."
+      )
+    );
+
+    return;
+  }
+
+  purchaseItems = data || [];
+
+  select.replaceChildren(
+    createText("option", "Select an item...")
+  );
+
+  select.firstChild.value = "";
+
+  purchaseItems.forEach(item => {
+    const option = createText(
+      "option",
+      `${item.title} — ${item.price} GC`
+    );
+
+    option.value = item.id;
+
+    select.appendChild(option);
+  });
+
+  select.addEventListener("change", updateSelectedItem);
+}
+
+function updateSelectedItem() {
+  const select = document.getElementById("purchase-item");
+  const box = document.getElementById("selected-item");
+
+  if (!select || !box) return;
+
+  const item = purchaseItems.find(
+    item => String(item.id) === select.value
+  );
+
+  if (!item) {
+    box.className = "selected-item";
+    box.replaceChildren();
+    return;
+  }
+
+  box.className = "selected-item show";
+
+  const title = createText("h3", item.title);
+
+  const description = createText(
+    "p",
+    item.description || "Available in the GBC marketplace."
+  );
+
+  const price = createText(
+    "strong",
+    `${item.price} GC`
+  );
+
+  box.append(title, description, price);
+}
+
+async function loadBankDetails() {
+  const bankName = document.getElementById("bank-name");
+
+  if (!bankName) return;
+
+  const { data, error } = await supabaseClient
+    .from("site_config")
+    .select("*")
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error("Bank details error:", error);
+
+    bankName.textContent = "Unable to load";
+    document.getElementById("bank-account")
+      .textContent = "Unable to load";
+    document.getElementById("bank-account-name")
+      .textContent = "Unable to load";
+
+    return;
+  }
+
+  // These are the expected site_config field names.
+  bankName.textContent = data.bank_name || "Not configured";
+
+  document.getElementById("bank-account")
+    .textContent = data.account_number || "Not configured";
+
+  document.getElementById("bank-account-name")
+    .textContent = data.account_name || "Not configured";
+}
+
+async function handlePurchase(event) {
+  event.preventDefault();
+
+  const message = document.getElementById("purchase-message");
+  const button = event.target.querySelector("button");
+  const select = document.getElementById("purchase-item");
+  const input = document.getElementById("purchase-receipt");
+
+  const session = await getCurrentSession();
+
+  if (!session) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const item = purchaseItems.find(
+    item => String(item.id) === select.value
+  );
+
+  const file = input.files[0];
+
+  if (!item) {
+    showMessage(message, "Please select an item.", "error");
+    return;
+  }
+
+  if (!file) {
+    showMessage(message, "Please upload a receipt.", "error");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Submitting order...";
+  message.className = "form-message";
+
+  try {
+    const orderId =
+      `GBC-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+
+    const safeName = file.name.replace(
+      /[^a-zA-Z0-9._-]/g,
+      "_"
+    );
+
+    const receiptPath =
+      `${session.user.id}/${orderId}-${safeName}`;
+
+    // Upload receipt first.
+    const { error: uploadError } =
+      await supabaseClient.storage
+        .from("receipts")
+        .upload(receiptPath, file, {
+          upsert: false
+        });
+
+    if (uploadError) {
+      throw new Error(uploadError.message);
+    }
+
+    // Insert the order with the receipt path.
+    const { error: orderError } =
+      await supabaseClient
+        .from("orders")
+        .insert({
+          order_id: orderId,
+          user_id: session.user.id,
+          item_title: item.title,
+          item_price: item.price,
+          receipt_path: receiptPath,
+          status: "pending"
+        });
+
+    if (orderError) {
+      throw new Error(orderError.message);
+    }
+
+    showMessage(
+      message,
+      "Order submitted successfully. You can track it in your account.",
+      "success"
+    );
+
+    event.target.reset();
+
+    setTimeout(() => {
+      window.location.href = "account.html";
+    }, 1200);
+
+  } catch (error) {
+    console.error("Purchase error:", error);
+
+    showMessage(
+      message,
+      error.message,
+      "error"
+    );
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "Submit Order";
+  }
+}
+
+
 // ---------- LOGOUT ----------
 
 async function logoutPlayer() {
@@ -630,6 +843,19 @@ document.addEventListener("DOMContentLoaded", () => {
         await loadOrders(session.user.id);
       }
     });
+  }
+
+  const purchaseForm =
+    document.getElementById("purchase-form");
+
+  if (purchaseForm) {
+    loadPurchaseItems();
+    loadBankDetails();
+
+    purchaseForm.addEventListener(
+      "submit",
+      handlePurchase
+    );
   }
 
   loadAccount();
