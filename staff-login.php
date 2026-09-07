@@ -33,21 +33,21 @@
             <form id="staffApplyForm" style="display: none;" onsubmit="handleStaffApplication(event)">
                 <div class="form-group">
                     <label>Staff Handle</label>
-                    <input type="text" id="appUser" required>
+                    <input type="text" id="appUser" required placeholder="Your desired staff handle">
                 </div>
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" id="appEmail" required>
+                    <input type="email" id="appEmail" required placeholder="email@domain.com">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="appPass" required>
+                    <input type="password" id="appPass" required placeholder="Secure password">
                 </div>
                 <div class="form-group">
                     <label>Experience / Reason</label>
-                    <textarea id="appReason" rows="3" required></textarea>
+                    <textarea id="appReason" rows="3" required placeholder="Why should you be hired?"></textarea>
                 </div>
-                <button type="submit" class="btn-primary btn-whatsapp">SUBMIT APPLICATION</button>
+                <button type="submit" class="btn-primary">SUBMIT APPLICATION</button>
             </form>
         </div>
     </div>
