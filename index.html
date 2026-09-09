@@ -9,7 +9,7 @@
 <body>
 
   <header class="navbar">
-    <a href="index.html" class="logo">
+    <a href="index.html" class="logo" id="secretLogo">
       <span>GBC</span>
       <small>GRAND BILLIONAIRE CITY</small>
     </a>
@@ -17,23 +17,24 @@
     <nav>
       <a href="index.html">Home</a>
       <a href="#store">Store</a>
-      <a href="login.html">Player Login</a>
+      <!-- NO PLAYER LOGIN HERE -->
     </nav>
   </header>
 
   <main>
     <section class="hero">
       <div class="hero-content">
-        <span class="eyebrow">WELCOME TO GBC</span>
+        <span class="eyebrow">WELCOME TO GBC • 15K+ PLAYERS</span>
         <h1>Build your empire.<br><span>Rule your city.</span></h1>
         <p>
           Enter Grand Billionaire City — a world of luxury,
-          ambition, and unlimited possibilities.
+          ambition, and unlimited possibilities. No account needed to browse.
         </p>
 
         <div class="hero-actions">
-          <a href="register.html" class="btn btn-primary">Create Account</a>
-          <a href="#store" class="btn btn-secondary">Explore Store</a>
+          <!-- REMOVED Create Account -->
+          <a href="#store" class="btn btn-primary">Explore Store</a>
+          <a href="#store" class="btn btn-secondary">View Marketplace</a>
         </div>
       </div>
     </section>
@@ -43,9 +44,9 @@
         <div>
           <span class="eyebrow">MARKETPLACE</span>
           <h2>Build your empire</h2>
-          <p>Purchase coins, vehicles, and properties.</p>
+          <p>Purchase coins, vehicles, and properties. Contact staff on Discord to order.</p>
         </div>
-        <a href="login.html" class="text-link">View all →</a>
+        <!-- REMOVED View all -> login -->
       </div>
 
       <div id="store-grid" class="store-grid">
@@ -64,5 +65,22 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
+  <script>
+  // HIDDEN STAFF ACCESS - NO HINT ON PAGE
+  let clicks=0, t=null;
+  const logo=document.getElementById('secretLogo');
+  logo.addEventListener('click',(e)=>{
+    e.preventDefault();
+    clicks++;
+    if(clicks>=5){ window.location.href='staff-login.html'; return; }
+    clearTimeout(t); t=setTimeout(()=>clicks=0,2000);
+  });
+  let press;
+  logo.addEventListener('touchstart',()=>{ press=setTimeout(()=>location.href='staff-login.html',2500); });
+  logo.addEventListener('touchend',()=>clearTimeout(press));
+  logo.addEventListener('mousedown',()=>{ press=setTimeout(()=>location.href='staff-login.html',2500); });
+  logo.addEventListener('mouseup',()=>clearTimeout(press));
+  if(location.search.includes('staff')) location.href='staff-login.html';
+  </script>
 </body>
 </html>
